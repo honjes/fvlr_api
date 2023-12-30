@@ -1,11 +1,10 @@
 // Fetches details on a single event
 
 // External Libs
-import axios from 'axios';
+
 import { load } from 'cheerio';
 import { idGenerator } from '../util';
-
-
+import { event_medium } from '../../types/events';
 
 const fetchOneEvent = async (id: string): Promise<Object> => {
     // Validate input
@@ -13,13 +12,17 @@ const fetchOneEvent = async (id: string): Promise<Object> => {
     if (!id.match(/^[0-9]+$/)) throw new Error("Invalid ID");
     return new Promise(async (resolve, reject) => {
         // fetch the page
-        axios.get(`https://www.vlr.gg/event/${id}`)
-            .then((response) => {
+        fetch(`https://www.vlr.gg/event/${id}`)
+            .then(response => response.text())
+            .then((data) => {
                 // parse the page
-                let $ = load(response.data);
-                const Event = new Object();
+                const $ = load(data);
+                const Event = {} as event_medium;
+                Event.type = "event_medium";
                 Event.name = $('h1.wf-title').text().trim();
-
+                Event.link = `https://www.vlr.gg/event/${id}`;
+                Event.id = id;
+                Event.img = "https:" + $(".wf-avatar.event-header-thumb img").attr('src');
                 // Get all teams
                 const Teams = new Array();
                 $(".event-team").each((i, element) => {
@@ -84,4 +87,4 @@ const fetchOneEvent = async (id: string): Promise<Object> => {
     });
 }
 
-module.exports = { fetchOneEvent };
+export { fetchOneEvent };
