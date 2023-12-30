@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "format": "prettier --write ."
   },
   "dependencies": {
+    "@hono/swagger-ui": "^0.2.1",
+    "@hono/zod-openapi": "^0.9.5",
     "cheerio": "^1.0.0-rc.12",
     "hono": "^3.11.11",
     "redis": "^4.6.12"
