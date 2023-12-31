@@ -22,8 +22,8 @@ const fetchOneEvent = async (id: string): Promise<Object> => {
         const $ = load(data)
         if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
           reject("404")
-        const Event = {} as event_medium
-        Event.type = 'event_medium'
+        const Event = {} as Event
+        Event.type = 'event'
         Event.name = $('h1.wf-title').text().trim()
         Event.link = `https://www.vlr.gg/event/${id}`
         Event.id = id

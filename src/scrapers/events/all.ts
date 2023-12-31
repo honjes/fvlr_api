@@ -17,8 +17,8 @@ const fetchAllEvents = (page: number = 1): Promise<Object> => {
       .then((data) => {
         const $ = load(data)
         $('.event-item').each((i, element) => {
-          const Event = {} as Event_SM
-          Event.type = 'Event_SM'
+          const Event = {} as Event
+          Event.type = 'event'
           Event.link = `https://www.vlr.gg` + $(element).attr('href')
           Event.id = idGenerator(Event.link.split('/')[4])
           Event.name = $(element).find('.event-item-title').text().trim()
