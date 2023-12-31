@@ -22,10 +22,16 @@ app.use('*', async (c, next) => {
     data: {},
   }
   // Reject Blacklisted Routes
-  if (c.req.path.includes('favicon.ico')) {
+  if (
+    c.req.path.includes('favicon.ico') ||
+    c.req.path === "" ||
+    c.req.path === "/" ||
+    c.req.path === "/doc"
+    ) {
     await next()
     return
   }
+  console.log(c.req.path);
   // Cached Response
   if (await client.exists(c.req.path)) {
     console.log('Cached Response')
