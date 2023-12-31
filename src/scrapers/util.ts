@@ -1,3 +1,4 @@
+import { CheerioAPI } from 'cheerio'
 const idGenerator = function (id: string) {
   // Takes an id and returns a 16 character string of 0x000... + id
   if (!id.match(/^[0-9]+$/)) throw new Error(`Invalid ID: ${id}`)

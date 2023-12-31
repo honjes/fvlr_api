@@ -10,7 +10,7 @@ import { MatchSchema } from '../../schemas/schemas';
 type Match = z.infer<typeof MatchSchema>
 
 
-const fetchOneMatch = async (id: string) => {
+const fetchOneMatch = async (id: string): Promise<Object> => {
   // Validate input
   // make sure id is a string of numbers
   if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
@@ -45,7 +45,7 @@ const fetchOneMatch = async (id: string) => {
           Match.teams.push({
             name: $(element).text().trim(),
             id: idGenerator(
-              $(element).parent().parent().attr('href').split('/')[2]
+              $(element).parent().parent().attr('href')?.split('/')[2]
             ),
             mapScore: MapScore[i],
           })

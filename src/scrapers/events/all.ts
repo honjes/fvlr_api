@@ -5,13 +5,13 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { EventSmallSchema } from '../../schemas/schemas'
+import { EventSchema } from '../../schemas/schemas'
 // Type
-type Event_SM = z.infer<typeof EventSmallSchema>
+type Event = z.infer<typeof EventSchema>
 
 const fetchAllEvents = (page: number = 1): Promise<Object> => {
   return new Promise((resolve, reject) => {
-    const Events: Array<Event_SM> = []
+    const Events: Array<Event> = []
     fetch(`https://www.vlr.gg/events/?page=${page}`)
       .then((response) => response.text())
       .then((data) => {

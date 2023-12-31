@@ -3,6 +3,11 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator, AgentArray } from '../util'
+// Schema
+import { z } from '@hono/zod-openapi'
+import { PlayerSchema } from '../../schemas/schemas'
+// Type
+type Player = z.infer<typeof PlayerSchema>
 
 const fetchOnePlayer = async (id: string) => {
   // Validate input
@@ -26,6 +31,10 @@ const fetchPlayer = async (id: string) => {
       .then((data) => {
         // parse the page
         const $ = load(data)
+        // Check for the 404 string
+        if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
+          reject("404")
+
         let Player = new Object()
         Player.ign = $('h1.wf-title').text().trim()
         Player.name = Player.ign
@@ -127,6 +136,7 @@ const cleanCountry = (country: string) => {
   return country
 }
 const cleanPhoto = (photo: string) => {
+  if(photo === undefined) return ''
   if (photo.includes('owcdn.net')) photo = `https:${photo}`
   else photo = ''
   return photo.replace(/[\n,\t]/g, '')

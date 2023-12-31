@@ -2,14 +2,19 @@
 import { z } from '@hono/zod-openapi'
 import { createRoute } from '@hono/zod-openapi'
 import { Context } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
 import { fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
+import { fetchOnePlayer } from '../scrapers/player/one'
+import { fetchOneTeam } from '../scrapers/team/one'
 // Schemas
-import { EventSmallSchema, IDSchema } from '../schemas/schemas'
+import { EventSchema, IDSchema } from '../schemas/schemas'
 
+// Works Perfectly
 const EventsRoute = {
   route: createRoute({
     method: 'get',
@@ -21,7 +26,7 @@ const EventsRoute = {
         description: 'Fetches all events from the /events page',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
@@ -29,16 +34,18 @@ const EventsRoute = {
   }),
   handler: async (c: Context) => {
     const Events = await fetchAllEvents()
-    return c.json<Object>({
-      status: 'success',
-      data: Events,
-    })
+    return c.json<Object>(Events)
   },
 }
+
+// Bad routes return successfully, but with empty params
+// This is because Matches and Form Threads are both using root ids
+// vlr.gg/{id}
+//- Needs Schema Work
 const MatchRoute = {
   route: createRoute({
     method: 'get',
-    path: '/match/{match_id}',
+    path: '/match/{id}',
     tags: ['Root Routes'],
     request: {
       params: IDSchema,
@@ -49,51 +56,54 @@ const MatchRoute = {
         description: 'Fetches a Match based on the Match ID from vlr.gg',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
     },
   }),
   handler: async (c: Context) => {
-    const Match = await fetchOneMatch(c.req.param('match_id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Match,
-    })
+    const Match = await fetchOneMatch(c.req.param('id'))
+    return c.json<Object>(Match)
   },
 }
+
+// Works Perfectly!
+//- Needs Schema Work
 const PlayerRoute = {
   route: createRoute({
     method: 'get',
-    path: '/player/{player_id}',
+    path: '/player/{id}',
     tags: ['Root Routes'],
     request: {
       params: IDSchema,
     },
     responses: {
       200: {
-        description: 'Fetches all events from the /events page',
+        description: 'Fetches a Player based on their ID from vlr.gg',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
     },
   }),
   handler: async (c: Context) => {
-    const Events = await fetchAllEvents()
-    return c.json<Object>({
-      status: 'success',
-      data: Events,
-    })
+    const Player = await fetchOnePlayer(c.req.param('id'))
+      .catch((err) => {
+        throw Error(err)
+      });
+    return c.json<Object>(Player)
   },
 }
+
+// Works Perfectly!
+//- Needs Schema Work
 const TeamRoute = {
   route: createRoute({
     method: 'get',
-    path: '/team/{team_id}',
+    path: '/team/{id}',
     tags: ['Root Routes'],
     request: {
       params: IDSchema,
@@ -103,20 +113,23 @@ const TeamRoute = {
         description: 'Fetches all events from the /events page',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
     },
   }),
   handler: async (c: Context) => {
-    const Events = await fetchAllEvents()
-    return c.json<Object>({
-      status: 'success',
-      data: Events,
-    })
+    const Team = await fetchOneTeam(c.req.param('id'))
+      .catch((err)=>{
+        throw Error(err)
+      })
+    return c.json<Object>(Team)
   },
 }
+
+// Works Perfectly!
+//- Needs Schema Work
 const EventRoute = {
   route: createRoute({
     method: 'get',
@@ -130,7 +143,7 @@ const EventRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
@@ -138,12 +151,14 @@ const EventRoute = {
   }),
   handler: async (c: Context) => {
     const Event = await fetchOneEvent(c.req.param('id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Event,
-    })
+      .catch((err)=>{
+        throw Error(err)
+      });
+    return c.json<Object>(Event)
   },
 }
+// Untested
+//- Needs Schema Work
 const EventPlayersRoute = {
   route: createRoute({
     method: 'get',
@@ -157,7 +172,7 @@ const EventPlayersRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
@@ -171,6 +186,8 @@ const EventPlayersRoute = {
     })
   },
 }
+// Untested
+//- Needs Schema Work
 const EventTeamsRoute = {
   route: createRoute({
     method: 'get',
@@ -184,7 +201,7 @@ const EventTeamsRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
@@ -198,6 +215,8 @@ const EventTeamsRoute = {
     })
   },
 }
+// Untested
+//- Needs Schema Work
 const EventMatchesRoute = {
   route: createRoute({
     method: 'get',
@@ -211,7 +230,7 @@ const EventMatchesRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSmallSchema,
+            schema: EventSchema,
           },
         },
       },
@@ -226,6 +245,41 @@ const EventMatchesRoute = {
   },
 }
 
+// Working!
+//- Add event specific routes
+const ErrorRoute = {
+  route: createRoute({
+    method: 'get',
+    path: '/error/{type}?',
+    tags: ['Event Routes'],
+    request: {
+      params: z.object({
+        type: z.string().optional(),
+      }),
+    },
+    responses: {
+      200: {
+        description: 'Displays a generic error for each type',
+        content: {
+          'application/json': {
+            schema: z.object({
+              status: z.string().openapi({example: "error"}),
+              message: z.string().openapi({example: "Error: 404"}),
+            }),
+          },
+        },
+      },
+    },
+  }),
+  handler: async (c: Context) => {
+    const type = c.req.param('type');
+    return c.json<Object>({
+      status: 'error',
+      message: "Error: 404",
+    })
+  },
+}
+
 export const Routes = [
   EventsRoute,
   EventRoute,
@@ -235,4 +289,5 @@ export const Routes = [
   MatchRoute,
   PlayerRoute,
   TeamRoute,
+  ErrorRoute
 ]

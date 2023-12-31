@@ -3,8 +3,13 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
+// Schema
+import { z } from '@hono/zod-openapi'
+import { TeamSchema } from '../../schemas/schemas'
+// Type
+type Team = z.infer<typeof TeamSchema>
 
-const fetchOneTeam = async (id: string) => {
+const fetchOneTeam = async (id: string): Promise<Object> => {
   // Validate input
   // make sure id is a string of numbers
   if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')
@@ -15,6 +20,9 @@ const fetchOneTeam = async (id: string) => {
       .then((data) => {
         // parse the page
         const $ = load(data)
+        // Check for the 404 string
+        if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
+          reject("404")
         let Team = new Object()
         // Team Name,, Logo, Region, Socials, Roster, Staff, Earnings
         Team.name = $('h1.wf-title').text().trim()

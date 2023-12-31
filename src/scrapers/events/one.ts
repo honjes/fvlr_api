@@ -20,6 +20,8 @@ const fetchOneEvent = async (id: string): Promise<Object> => {
       .then((data) => {
         // parse the page
         const $ = load(data)
+        if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
+          reject("404")
         const Event = {} as event_medium
         Event.type = 'event_medium'
         Event.name = $('h1.wf-title').text().trim()

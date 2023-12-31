@@ -3,6 +3,11 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
+// Schema
+import { z } from '@hono/zod-openapi'
+import { MatchSchema } from '../../schemas/schemas'
+// Type
+type Match = z.infer<typeof MatchSchema>
 
 const fetchAllMatches = async (id: string) => {
   // Validate input
