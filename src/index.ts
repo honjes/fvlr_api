@@ -15,37 +15,68 @@ app.use("*", cors({
 
 // Caching
 app.use('*', async (c, next) => {
+  // Set a Default Return Value
+  const DefaultResult = {
+    cached: false,
+    status: 'success',
+    data: {},
+  }
+  // Reject Blacklisted Routes
   if (c.req.path.includes('favicon.ico')) {
     await next()
     return
   }
-  // Check if the request is in the Redis Cache, if not then continue, if so then return the cached response
+  // Cached Response
   if (await client.exists(c.req.path)) {
     console.log('Cached Response')
-    const data = await client.get(c.req.path)
-    let ret
+    const cachedData = await client.get(c.req.path)
+    let cachedResponse
+    // Clear the Cache if the data is not valid JSON
     try {
-      ret = JSON.parse(data)
+      cachedResponse = JSON.parse(cachedData)
     } catch {
-      // Clear Cache
+      // Clear Cache and close the request
       client.del(c.req.path)
       await next()
       return
     }
-    return c.json({
-      cached: true,
-      ...ret
-    })
-  } else {
+    // Return the Cached Response
+    // If the Cached Response was an error, we Overwrite the fields 
+    if(cachedResponse.status === "error") {
+      c.res = c.json(Object.assign(DefaultResult,{
+        cached: true,
+        status: "error",
+        message: cachedResponse.message
+      }));
+    } 
+    // Otherwise we return the cached response normally
+    else {
+      c.res = c.json(Object.assign(DefaultResult,{
+        cached: true,
+        data: cachedResponse
+      }));
+    }
+    return;
+  }
+  // Non-Cached Response
+  else {
     console.log('Not Cached Response')
+    // Let the page generate as normal
     await next()
-    // Cache the response
+    // Intercept the JSON
     const data = await c.res.json()
+    // Cache the response
     client.setEx(c.req.path, 60, JSON.stringify(data))
-    c.res = c.json({
-      cached: false,
-      ...data
-    })
+    // Check if it was an Error
+    if (data.status === 'error') {
+      c.res = c.json(Object.assign(DefaultResult,{cached: false, status:data.status, message: data.message}));
+      return;
+    }
+    // Otherwise return the data
+    else {
+      c.res = c.json(Object.assign(DefaultResult,{cached: false, data}));
+      return;
+    }
   }
 })
 app.use('/', async (c, next) => {
