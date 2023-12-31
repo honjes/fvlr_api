@@ -2,15 +2,14 @@
 import { z } from '@hono/zod-openapi'
 import { createRoute } from '@hono/zod-openapi'
 import { Context } from 'hono'
-import { HTTPException } from 'hono/http-exception'
 
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
-import { fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
+
 // Schemas
 import { EventSchema, IDSchema } from '../schemas/schemas'
 

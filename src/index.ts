@@ -14,43 +14,40 @@ app.use("*", cors({
 }))
 
 // Caching
-const cachePaths = ['/events', '/event', '/matches', '/match']
-// app.use('*', async (c, next) => {
-//   if (!cachePaths.some((path) => c.req.path.includes(path))) {
-//     await next()
-//     return
-//   }
-//   // Check if the request is in the Redis Cache, if not then continue, if so then return the cached response
-//   if (await client.exists(c.req.path)) {
-//     console.log('Cached Response')
-//     const data = await client.get(c.req.path)
-//     let ret
-//     try {
-//       ret = JSON.parse(data)
-//     } catch {
-//       // Clear Cache
-//       client.del(c.req.path)
-//       await next()
-//       return
-//     }
-//     return c.json({
-//       cached: true,
-//       status: 'success',
-//       data: ret,
-//     })
-//   } else {
-//     console.log('Not Cached Response')
-//     await next()
-//     // Cache the response
-//     const data = await c.res.json()
-//     client.setEx(c.req.path, 60, JSON.stringify(data))
-//     c.res = c.json({
-//       cached: false,
-//       status: 'success',
-//       data: data,
-//     })
-//   }
-// })
+app.use('*', async (c, next) => {
+  if (c.req.path.includes('favicon.ico')) {
+    await next()
+    return
+  }
+  // Check if the request is in the Redis Cache, if not then continue, if so then return the cached response
+  if (await client.exists(c.req.path)) {
+    console.log('Cached Response')
+    const data = await client.get(c.req.path)
+    let ret
+    try {
+      ret = JSON.parse(data)
+    } catch {
+      // Clear Cache
+      client.del(c.req.path)
+      await next()
+      return
+    }
+    return c.json({
+      cached: true,
+      ...ret
+    })
+  } else {
+    console.log('Not Cached Response')
+    await next()
+    // Cache the response
+    const data = await c.res.json()
+    client.setEx(c.req.path, 60, JSON.stringify(data))
+    c.res = c.json({
+      cached: false,
+      ...data
+    })
+  }
+})
 app.use('/', async (c, next) => {
   // inject css
   c.res.headers.append('Content-Type', 'text/html')
