@@ -9,9 +9,12 @@ import { createClient } from 'redis'
 const app = new OpenAPIHono()
 const client = createClient()
 // CORS
-app.use("*", cors({
-  origin: "*",
-}))
+app.use(
+  '*',
+  cors({
+    origin: '*',
+  })
+)
 
 // Caching
 app.use('*', async (c, next) => {
@@ -24,18 +27,20 @@ app.use('*', async (c, next) => {
   // Reject Blacklisted Routes
   if (
     c.req.path.includes('favicon.ico') ||
-    c.req.path === "" ||
-    c.req.path === "/" ||
-    c.req.path === "/doc"
-    ) {
+    c.req.path === '' ||
+    c.req.path === '/' ||
+    c.req.path === '/doc'
+  ) {
     await next()
     return
   }
-  console.log(c.req.path);
+  console.log(c.req.path)
+
   // Cached Response
   if (await client.exists(c.req.path)) {
     console.log('Cached Response')
     const cachedData = await client.get(c.req.path)
+    if (cachedData === null) return // Should never happen
     let cachedResponse
     // Clear the Cache if the data is not valid JSON
     try {
@@ -47,22 +52,26 @@ app.use('*', async (c, next) => {
       return
     }
     // Return the Cached Response
-    // If the Cached Response was an error, we Overwrite the fields 
-    if(cachedResponse.status === "error") {
-      c.res = c.json(Object.assign(DefaultResult,{
-        cached: true,
-        status: "error",
-        message: cachedResponse.message
-      }));
-    } 
+    // If the Cached Response was an error, we Overwrite the fields
+    if (cachedResponse.status === 'error') {
+      c.res = c.json(
+        Object.assign(DefaultResult, {
+          cached: true,
+          status: 'error',
+          message: cachedResponse.message,
+        })
+      )
+    }
     // Otherwise we return the cached response normally
     else {
-      c.res = c.json(Object.assign(DefaultResult,{
-        cached: true,
-        data: cachedResponse
-      }));
+      c.res = c.json(
+        Object.assign(DefaultResult, {
+          cached: true,
+          data: cachedResponse,
+        })
+      )
     }
-    return;
+    return
   }
   // Non-Cached Response
   else {
@@ -75,27 +84,36 @@ app.use('*', async (c, next) => {
     client.setEx(c.req.path, 60, JSON.stringify(data))
     // Check if it was an Error
     if (data.status === 'error') {
-      c.res = c.json(Object.assign(DefaultResult,{cached: false, status:data.status, message: data.message}));
-      return;
+      c.res = c.json(
+        Object.assign(DefaultResult, {
+          cached: false,
+          status: data.status,
+          message: data.message,
+        })
+      )
+      return
     }
     // Otherwise return the data
     else {
-      c.res = c.json(Object.assign(DefaultResult,{cached: false, data}));
-      return;
+      c.res = c.json(Object.assign(DefaultResult, { cached: false, data }))
+      return
     }
   }
 })
+
 app.use('/', async (c, next) => {
   // inject css
   c.res.headers.append('Content-Type', 'text/html')
   await next()
 })
+
 // Routes
 Routes.forEach((route) => {
   app.openapi(route.route, (c) => {
     return route.handler(c)
   })
 })
+
 // Swagger UI
 app.get(
   '/',
@@ -103,6 +121,7 @@ app.get(
     url: '/doc',
   })
 )
+
 // OpenAPI Docs
 app.doc('/doc', {
   openapi: '3.1.0',
@@ -125,6 +144,7 @@ app.doc('/doc', {
     version: 'v0.1',
   },
 })
+
 // JSON errors
 app.onError((err, c) => {
   console.error(`${err}`)
@@ -133,6 +153,7 @@ app.onError((err, c) => {
     message: `${err}`,
   })
 })
+
 // Connect to Redis
 client.connect().then(() => {
   console.log('Redis connected!')
@@ -140,4 +161,9 @@ client.connect().then(() => {
     console.log('Cleared Cache')
   })
 })
-export default app
+
+// Start the server
+export default {
+  port: 3000,
+  ...app,
+}

@@ -6,7 +6,7 @@ const IDType = z
   .regex(/^[0-9]+$/) // Only numbers
   .openapi({
     example: '0 (1-16 characters)',
-  });
+  })
 
 const IDSchema = z.object({
   id: IDType,
@@ -61,14 +61,12 @@ const TeamSchema = z.object({
   mapScore: z.string().openapi({
     example: '13',
   }),
-});
+})
 const GameSchema = z.object({
   map: z.string().openapi({
     example: 'Bind',
   }),
-  teams: z.array(
-    TeamSchema
-  ),
+  teams: z.array(TeamSchema),
 })
 const MatchSchema = z.object({
   type: z.string().openapi({
@@ -81,12 +79,8 @@ const MatchSchema = z.object({
     .openapi({
       example: '000000000001927',
     }),
-  games: z.array(
-    GameSchema
-  ),
-  teams: z.array(
-    TeamSchema
-  ),
+  games: z.array(GameSchema),
+  teams: z.array(TeamSchema),
   link: z.string().openapi({
     example:
       'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',

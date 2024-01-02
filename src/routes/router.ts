@@ -89,10 +89,9 @@ const PlayerRoute = {
     },
   }),
   handler: async (c: Context) => {
-    const Player = await fetchOnePlayer(c.req.param('id'))
-      .catch((err) => {
-        throw Error(err)
-      });
+    const Player = await fetchOnePlayer(c.req.param('id')).catch((err) => {
+      throw Error(err)
+    })
     return c.json<Object>(Player)
   },
 }
@@ -119,10 +118,9 @@ const TeamRoute = {
     },
   }),
   handler: async (c: Context) => {
-    const Team = await fetchOneTeam(c.req.param('id'))
-      .catch((err)=>{
-        throw Error(err)
-      })
+    const Team = await fetchOneTeam(c.req.param('id')).catch((err) => {
+      throw Error(err)
+    })
     return c.json<Object>(Team)
   },
 }
@@ -149,10 +147,9 @@ const EventRoute = {
     },
   }),
   handler: async (c: Context) => {
-    const Event = await fetchOneEvent(c.req.param('id'))
-      .catch((err)=>{
-        throw Error(err)
-      });
+    const Event = await fetchOneEvent(c.req.param('id')).catch((err) => {
+      throw Error(err)
+    })
     return c.json<Object>(Event)
   },
 }
@@ -262,8 +259,8 @@ const ErrorRoute = {
         content: {
           'application/json': {
             schema: z.object({
-              status: z.string().openapi({example: "error"}),
-              message: z.string().openapi({example: "Error: 404"}),
+              status: z.string().openapi({ example: 'error' }),
+              message: z.string().openapi({ example: 'Error: 404' }),
             }),
           },
         },
@@ -271,10 +268,10 @@ const ErrorRoute = {
     },
   }),
   handler: async (c: Context) => {
-    const type = c.req.param('type');
+    const type = c.req.param('type')
     return c.json<Object>({
       status: 'error',
-      message: "Error: 404",
+      message: 'Error: 404',
     })
   },
 }
@@ -288,5 +285,5 @@ export const Routes = [
   MatchRoute,
   PlayerRoute,
   TeamRoute,
-  ErrorRoute
+  ErrorRoute,
 ]

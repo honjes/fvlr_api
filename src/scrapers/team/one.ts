@@ -17,12 +17,16 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
     // fetch the page
     fetch(`https://www.vlr.gg/team/${id}`)
       .then((response) => response.text())
-      .then((data) => {
+      .then(async (data) => {
         // parse the page
         const $ = load(data)
         // Check for the 404 string
-        if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
-          reject("404")
+        if (
+          $('#wrapper > .col-container > div:first-child')
+            .text()
+            .includes('Page not found')
+        )
+          reject('404')
         let Team = new Object()
         // Team Name,, Logo, Region, Socials, Roster, Staff, Earnings
         Team.name = $('h1.wf-title').text().trim()
@@ -48,11 +52,11 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
           try {
             socialURL = new URL(socialLink)
           } catch {
-            defaultLogger.error(
+            console.error(
               'Error setting socialURL: ' + socialLink + ' | Page: ' + url,
               false
             )
-            defaultLogger.info('FUCKING SOCIAL LINKS CAN SUCK MY ASS')
+            console.info('FUCKING SOCIAL LINKS CAN SUCK MY ASS')
             process.exit()
             return
           }
@@ -102,6 +106,19 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
         Team.players_item.forEach((player) => {
           Team.players.push(idGenerator(player.id))
         })
+        // SICK way of keeping players cached ;)
+        const PlayerPromises = [
+          ...Team.players_item.map((player) => {
+            return fetch('http://localhost:3000/player/' + player.id)
+          }),
+          ...Team.staff_item.map((player) => {
+            return fetch('http://localhost:3000/player/' + player.id)
+          }),
+        ]
+        let Players = await Promise.all(PlayerPromises)
+        Players = await Promise.all(Players.map((res) => res.json()))
+        Team.players = Players.map((player) => player.data[0]);
+        delete Team.players_item
         // Generate team.staff array of ids
         Team.staff = new Array()
         Team.staff_item.forEach((player) => {
@@ -111,6 +128,7 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
         resolve(Team)
       })
       .catch((err) => {
+        console.error(err)
         // if 404 then return a custom error
         if (err.response.status == 404) {
           reject(new Error('Team Not Found'))

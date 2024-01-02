@@ -32,8 +32,12 @@ const fetchPlayer = async (id: string) => {
         // parse the page
         const $ = load(data)
         // Check for the 404 string
-        if($('#wrapper > .col-container > div:first-child').text().includes("Page not found"))
-          reject("404")
+        if (
+          $('#wrapper > .col-container > div:first-child')
+            .text()
+            .includes('Page not found')
+        )
+          reject('404')
 
         let Player = new Object()
         Player.ign = $('h1.wf-title').text().trim()
@@ -136,7 +140,7 @@ const cleanCountry = (country: string) => {
   return country
 }
 const cleanPhoto = (photo: string) => {
-  if(photo === undefined) return ''
+  if (photo === undefined) return ''
   if (photo.includes('owcdn.net')) photo = `https:${photo}`
   else photo = ''
   return photo.replace(/[\n,\t]/g, '')
