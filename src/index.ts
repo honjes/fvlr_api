@@ -4,10 +4,14 @@ import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import { Routes } from './routes/router'
 import { createClient } from 'redis'
-
+const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 // Initial Setup
 const app = new OpenAPIHono()
-const client = createClient()
+const client = createClient({
+  url: DB_URI,
+})
+let CacheEnabled = true
+let ConnectionCount = 0
 // CORS
 app.use(
   '*',
@@ -15,9 +19,12 @@ app.use(
     origin: '*',
   })
 )
-
 // Caching
 app.use('*', async (c, next) => {
+  if (!CacheEnabled) {
+    await next()
+    return
+  }
   // Set a Default Return Value
   const DefaultResult = {
     cached: false,
@@ -39,7 +46,7 @@ app.use('*', async (c, next) => {
   // Cached Response
   if (await client.exists(c.req.path)) {
     console.log('Cached Response')
-    const cachedData = await client.get(c.req.path)
+    const cachedData = await client.get(c.req.path) // .001ms
     if (cachedData === null) return // Should never happen
     let cachedResponse
     // Clear the Cache if the data is not valid JSON
@@ -102,7 +109,6 @@ app.use('*', async (c, next) => {
 })
 
 app.use('/', async (c, next) => {
-  // inject css
   c.res.headers.append('Content-Type', 'text/html')
   await next()
 })
@@ -155,13 +161,33 @@ app.onError((err, c) => {
 })
 
 // Connect to Redis
-client.connect().then(() => {
-  console.log('Redis connected!')
-  client.flushAll().then(() => {
-    console.log('Cleared Cache')
-  })
-})
-
+const RedisConnect = async () => {
+  client
+    .connect()
+    .then(() => {
+      console.log('Redis connected!')
+      client.flushAll().then(() => {
+        console.log('Cleared Cache')
+      })
+      CacheEnabled = true
+    })
+    .catch((err) => {
+      ConnectionCount++
+      console.log('Redis Connection Error: Attempt ' + ConnectionCount)
+      console.log('Caching Disabled')
+      CacheEnabled = false
+      if (ConnectionCount > 3) {
+        console.log('Redis Connection Error: Max Attempts Reached')
+        console.log('Caching Permanently Disabled')
+        return
+      } else {
+        setTimeout(() => {
+          RedisConnect()
+        }, 5000)
+      }
+    })
+}
+RedisConnect()
 // Start the server
 export default {
   port: 3000,
