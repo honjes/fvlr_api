@@ -5,6 +5,7 @@ import { cors } from 'hono/cors'
 import { Routes } from './routes/router'
 import { createClient } from 'redis'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
+const PORT = process.env.PORT || 3000
 // Initial Setup
 const app = new OpenAPIHono()
 const client = createClient({
@@ -190,6 +191,6 @@ const RedisConnect = async () => {
 RedisConnect()
 // Start the server
 export default {
-  port: 3000,
+  port: PORT,
   ...app,
 }
