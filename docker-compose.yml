@@ -10,7 +10,7 @@ services:
   vlrapi2:
     image: vlrapi2
     ports:
-      - 9090:3000
+      - 9091:3000
     networks:
       - vlr_network
     links:

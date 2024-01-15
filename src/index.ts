@@ -4,6 +4,7 @@ import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import { Routes } from './routes/router'
 import { createClient } from 'redis'
+import 'dotenv/config'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 const PORT = process.env.PORT || 3000
 // Initial Setup
