@@ -120,7 +120,6 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
               Player.statsadvanced = new Object()
               Player.stats = new Object()
               playerStats.each((i, element) => {
-                console.log('Switching')
                 const ct = $(element).find('.mod-ct').text().trim()
                 const t = $(element).find('.mod-t').text().trim()
                 const ot = $(element).find('.mod-ot').text().trim()
@@ -190,6 +189,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           }
         })
 
+        console.log('Match Pulled: ' + Match.id)
         resolve(Match)
       })
       .catch((err) => {
