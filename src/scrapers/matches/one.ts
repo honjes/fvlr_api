@@ -29,6 +29,14 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
         Match.time = $('.match-header-date .moment-tz-convert:nth-child(2)')
           .text()
           .trim()
+        Match.event = $('.match-header-super a.match-header-event')
+          .attr('href')
+          ?.split('/')[2]
+        Match.eventname = $(
+          '.match-header-super a.match-header-event div > div:nth-child(1)'
+        )
+          .text()
+          .trim()
         Match.games = new Array()
         Match.teams = new Array()
         Match.players = new Array()
