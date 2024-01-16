@@ -1,8 +1,13 @@
 import { CheerioAPI } from 'cheerio'
 const idGenerator = function (id: string) {
   // Takes an id and returns a 16 character string of 0x000... + id
-  if (!id.match(/^[0-9]+$/)) throw new Error(`Invalid ID: ${id}`)
-  return id.padStart(15, '0')
+  try {
+    if (!id.match(/^[0-9]+$/)) return '0'
+    return id.padStart(15, '0')
+  } catch (err) {
+    console.log(id)
+    return 'n/a'
+  }
 }
 // Todo - Automate this using the official api
 const AgentArray = [
