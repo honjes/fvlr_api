@@ -90,7 +90,15 @@ app.use('*', async (c, next) => {
     // Intercept the JSON
     const data = await c.res.json()
     // Cache the response
-    client.setEx(c.req.path, 60, JSON.stringify(data))
+    const cacheLifespan = () => {
+      switch (c.req.path.split('/')[1]) {
+        case 'matches':
+          return 60 * 60 * 2 // 2 Hours
+        default:
+          return 60
+      }
+    }
+    client.setEx(c.req.path, cacheLifespan(), JSON.stringify(data))
     // Check if it was an Error
     if (data.status === 'error') {
       c.res = c.json(

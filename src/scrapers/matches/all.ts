@@ -1,95 +1,64 @@
-// Fetches details on a single event
+// Fetches all matches from the /matches route
 
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
+import { fetchOneMatch } from './one'
 // Schema
 import { z } from '@hono/zod-openapi'
 import { MatchSchema } from '../../schemas/schemas'
 // Type
 type Match = z.infer<typeof MatchSchema>
 
-const fetchAllMatches = async (id: string) => {
-  // Validate input
-  // make sure id is a string of numbers
-  if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
+const fetchAllMatches = async () => {
   return new Promise(async (resolve, reject) => {
     // fetch the page
-    fetch(`https://www.vlr.gg/event/matches/${id}`)
+    fetch(`https://www.vlr.gg/matches`)
       .then((response) => response.text())
       .then((data) => {
         // parse the page
         let $ = load(data)
-        const Event = new Object()
-        Event.name = $('h1.wf-title').text().trim()
-
-        // Matches
-        const MatchDates = new Array()
-        // Get All Headers
-        const Headers = new Array()
-        const HeaderObjects = $('.col.mod-1 > .wf-label.mod-large')
-        HeaderObjects.each((i, element) => {
-          Headers.push({
-            date: $(element)
-              .text()
-              .replaceAll('\n', '')
-              .replaceAll('\t', '')
-              .replace('Today', '')
-              .trim(),
-            children: $(element).next().find('a').length,
-          })
-        })
-        // Generate All Dates
-        Headers.forEach((header) => {
-          for (let i = 0; i < header.children; i++) {
-            MatchDates.push(header.date)
-          }
-        })
-        // Get all Matches
-        const Matches = new Array()
-        const MatchObjects = $('.col.mod-1 .wf-card a')
-        let MatchIndex = 0
-        MatchObjects.each((i, element) => {
-          if ($(element).find('.match-item-time').text().trim() === '') return
+        let Matches = new Array()
+        const Labels = $(
+          '#wrapper > div.col-container > div:nth-child(1) > .wf-label.mod-large'
+        )
+        const MatchContainer = $(
+          '#wrapper > div.col-container > div:nth-child(1) > .wf-card[style="margin-bottom: 30px;"]'
+        )
+        Labels.each((i, element) => {
+          const today =
+            $(element).text().trim().split('\n').length > 1 ? true : false
           Matches.push({
-            time:
-              MatchDates[MatchIndex] +
-              ' ' +
-              $(element).find('.match-item-time').text().trim(),
-            link: `https://www.vlr.gg${$(element).attr('href')}`,
-            id: idGenerator($(element).attr('href').split('/')[1]),
-            teams: [
-              $(element).find('.match-item-vs-team-name').first().text().trim(),
-              $(element).find('.match-item-vs-team-name').last().text().trim(),
-            ],
-            score: [
-              $(element)
-                .find('.match-item-vs-team-score')
-                .first()
-                .text()
-                .trim(),
-              $(element).find('.match-item-vs-team-score').last().text().trim(),
-            ],
-            eta: $(element)
-              .find('.match-item-eta')
-              .text()
-              .replaceAll('\n', ' ')
-              .replaceAll('\t', '')
-              .trim(),
-            series: $(element)
-              .find('.match-item-event-series')
-              .text()
-              .replaceAll('\n', ' ')
-              .replaceAll('\t', '')
-              .trim(),
+            date: $(element).text().trim().split('\n')[0].trim(),
+            today,
+            matches: new Array(),
           })
-          MatchIndex++
         })
+        const MatchPulls = new Array()
+        MatchContainer.each((i, container) => {
+          // Pull Matches from the container
+          $(container)
+            .find('a')
+            .each((index, match) => {
+              const link = $(match).attr('href')
+              if (!link) return
+              const id = idGenerator(link.split('/')[1])
+              // Should run this through  the cache instead,
+              // Fix later
+              MatchPulls.push(
+                fetchOneMatch(id).then((data) => {
+                  Matches[i].matches.push(data)
+                  return true
+                })
+              )
+            })
+        })
+        // Get all of the children divs
 
-        Event.Matches = Matches
-        Event.totalMatches = Matches.length
-
-        resolve(Event)
+        // Build the Matches Object
+        Promise.all(MatchPulls).then(() => {
+          resolve(Matches)
+        })
       })
       .catch((err) => {
         reject(err)

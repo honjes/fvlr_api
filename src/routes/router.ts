@@ -6,6 +6,7 @@ import { Context } from 'hono'
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
+import { fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
@@ -34,6 +35,29 @@ const EventsRoute = {
   handler: async (c: Context) => {
     const Events = await fetchAllEvents()
     return c.json<Object>(Events)
+  },
+}
+
+const MatchesRoute = {
+  route: createRoute({
+    method: 'get',
+    path: '/matches',
+    tags: ['Root Routes'],
+    description: 'Fetches all events from the vlr.gg/matches page',
+    responses: {
+      200: {
+        description: 'Fetches all events from the /matches page',
+        content: {
+          'application/json': {
+            schema: EventSchema,
+          },
+        },
+      },
+    },
+  }),
+  handler: async (c: Context) => {
+    const Matches = await fetchAllMatches()
+    return c.json<Object>(Matches)
   },
 }
 
@@ -282,6 +306,7 @@ export const Routes = [
   EventPlayersRoute,
   EventTeamsRoute,
   EventMatchesRoute,
+  MatchesRoute,
   MatchRoute,
   PlayerRoute,
   TeamRoute,
