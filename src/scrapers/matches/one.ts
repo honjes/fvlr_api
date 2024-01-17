@@ -38,6 +38,23 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
         )
           .text()
           .trim()
+
+        // Get Match Streams
+        Match.streams = new Array()
+        $('.match-streams .match-streams-btn').each((i, element) => {
+          if ($(element).attr('href')) {
+            Match.streams.push({
+              name: $(element).text().trim(),
+              link: $(element).attr('href'),
+            })
+          } else {
+            Match.streams.push({
+              name: $(element).text().trim(),
+              link: $(element).find('a').attr('href'),
+            })
+          }
+        })
+
         Match.games = new Array()
         Match.teams = new Array()
         Match.players = new Array()
@@ -64,6 +81,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
             mapScore: MapScore[i],
           })
         })
+
         // Getting Match Stats
         const StatsContainer = $(
           ".vm-stats-container .vm-stats-game[data-game-id!='all']"
