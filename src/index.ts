@@ -23,15 +23,18 @@ app.use(
 )
 // Caching
 app.use('*', async (c, next) => {
-  if (!CacheEnabled) {
-    await next()
-    return
-  }
   // Set a Default Return Value
   const DefaultResult = {
     cached: false,
     status: 'success',
     data: {},
+  }
+
+  if (!CacheEnabled) {
+    await next()
+    const data = await c.res.json()
+    c.res = c.json(Object.assign(DefaultResult, { cached: false, data }))
+    return
   }
   // Reject Blacklisted Routes
   if (
