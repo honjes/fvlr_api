@@ -68,6 +68,14 @@ const GameSchema = z.object({
   }),
   teams: z.array(TeamSchema),
 })
+const StreamSchema = z.object({
+  name: z.string(),
+  link: z.string()
+})
+const PlayerSchema = z.object({
+  name: z.string(),
+  link: z.string()
+})
 const MatchSchema = z.object({
   type: z.string().openapi({
     example: 'Match',
@@ -79,6 +87,11 @@ const MatchSchema = z.object({
     .openapi({
       example: '000000000001927',
     }),
+  time: z.string(),
+  event: z.string(), // ID or 0
+  eventname: z.string(),
+  streams: z.array(StreamSchema),
+  players: z.array(PlayerSchema),
   games: z.array(GameSchema),
   teams: z.array(TeamSchema),
   link: z.string().openapi({
