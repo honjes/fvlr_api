@@ -10,6 +10,7 @@ import { fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
+import { generateScore } from '../scrapers/matches/score'
 
 // Schemas
 import { EventSchema, IDSchema } from '../schemas/schemas'
@@ -265,6 +266,34 @@ const EventMatchesRoute = {
   },
 }
 
+const ScoreRoute = {
+  route: createRoute({
+    method: 'get',
+    path: '/score/{id}',
+    tags: ['Root Routes'],
+    request: {
+      params: IDSchema
+    },
+    responses: {
+      200: {
+        description: 'Generates the score for a given match',
+        content: {
+          'application/json': {
+            schema: EventSchema,
+          }
+        }
+      }
+    }
+  }),
+  handler: async (c: Context) => {
+    const Score = await generateScore(c.req.param('id'));
+    return c.json<Object>({
+      status: 'success',
+      data: Score
+    })
+  }
+}
+
 // Working!
 //- Add event specific routes
 const ErrorRoute = {
@@ -311,4 +340,5 @@ export const Routes = [
   PlayerRoute,
   TeamRoute,
   ErrorRoute,
+  ScoreRoute
 ]
