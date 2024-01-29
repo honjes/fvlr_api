@@ -30,14 +30,18 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
         Match.time = $('.match-header-date .moment-tz-convert:nth-child(2)')
           .text()
           .trim()
-        Match.event = $('.match-header-super a.match-header-event')
-          .attr('href')
-          ?.split('/')[2] || "0"
+        Match.eventid =
+          $('.match-header-super a.match-header-event')
+            .attr('href')
+            ?.split('/')[2] || '0'
         Match.eventname = $(
           '.match-header-super a.match-header-event div > div:nth-child(1)'
         )
           .text()
           .trim()
+        Match.logo =
+          'https:' +
+            $('.match-header-super a.match-header-event img').attr('src') || ''
 
         // Get Match Streams
         Match.streams = new Array()
@@ -45,15 +49,24 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           if ($(element).attr('href')) {
             Match.streams.push({
               name: $(element).text().trim(),
-              link: $(element).attr('href') || "",
+              link: $(element).attr('href') || '',
             })
           } else {
             Match.streams.push({
               name: $(element).text().trim(),
-              link: $(element).find('a').attr('href') || "",
+              link: $(element).find('a').attr('href') || '',
             })
           }
         })
+
+        Match.status = 'Upcoming'
+        if (
+          $('.match-header-vs-score > .match-header-vs-note:first-child')
+            .text()
+            .trim() == 'final'
+        ) {
+          Match.status = 'Completed'
+        }
 
         Match.games = new Array()
         Match.teams = new Array()
@@ -76,7 +89,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           Match.teams.push({
             name: $(element).text().trim(),
             id: idGenerator(
-              $(element).parent().parent().attr('href')?.split('/')[2] || ""
+              $(element).parent().parent().attr('href')?.split('/')[2] || ''
             ),
             mapScore: MapScore[i],
           })
