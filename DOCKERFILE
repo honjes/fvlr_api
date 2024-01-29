@@ -26,5 +26,5 @@ ENV NODE_ENV=production
 
 # run the app
 USER bun
-EXPOSE 3000/tcp
+EXPOSE 9091/tcp
 ENTRYPOINT [ "bun", "run", "--hot", "src/index.ts" ]
