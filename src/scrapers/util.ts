@@ -1,4 +1,3 @@
-import { CheerioAPI } from 'cheerio'
 const idGenerator = function (id: string) {
   // Takes an id and returns a 16 character string of 0x000... + id
   try {
@@ -9,8 +8,7 @@ const idGenerator = function (id: string) {
     return 'n/a'
   }
 }
-// Todo - Automate this using the official api
-const AgentArray = [
+let AgentArray = [
   'astra',
   'breach',
   'brimstone',
@@ -35,4 +33,12 @@ const AgentArray = [
   'viper',
   'yoru',
 ]
+
+fetch('https://valorant-api.com/v1/agents')
+  .then((res) => res.json())
+  .then((data) => {
+    AgentArray = data.data.map((agent: any) => agent.displayName)
+    console.log('Agents Updated')
+  })
+
 export { idGenerator, AgentArray }
