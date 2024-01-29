@@ -1,9 +1,17 @@
 import { fetchOneMatch } from "./one"
 
+type ScoresObject = {
+    [index: string]:Number
+}
+type PlayerScoreObject = {
+    name: String,
+    score: Number
+}
+
 const generateScore = async (id: string) => {
     const match = await fetchOneMatch(id);
-    const scores_object = {};
-    const scores_array = [];
+    const scores_object: ScoresObject = {};
+    const scores_array: PlayerScoreObject[] = [];
     // Itterate through the players, generate score based on formula
     match.players.forEach((player)=>{
         let score = 0;
