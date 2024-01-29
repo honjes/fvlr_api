@@ -1,4 +1,9 @@
 import { fetchOneMatch } from "./one"
+// Schema
+import { z } from '@hono/zod-openapi'
+import { MatchSchema } from '../../schemas/schemas'
+// Types
+type Match = z.infer<typeof MatchSchema>
 
 type ScoresObject = {
     [index: string]:Number
@@ -9,7 +14,7 @@ type PlayerScoreObject = {
 }
 
 const generateScore = async (id: string) => {
-    const match = await fetchOneMatch(id);
+    const match : Match = await fetchOneMatch(id);
     const scores_object: ScoresObject = {};
     const scores_array: PlayerScoreObject[] = [];
     // Itterate through the players, generate score based on formula

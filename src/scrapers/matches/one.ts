@@ -32,7 +32,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           .trim()
         Match.event = $('.match-header-super a.match-header-event')
           .attr('href')
-          ?.split('/')[2]
+          ?.split('/')[2] || "0"
         Match.eventname = $(
           '.match-header-super a.match-header-event div > div:nth-child(1)'
         )
@@ -45,12 +45,12 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           if ($(element).attr('href')) {
             Match.streams.push({
               name: $(element).text().trim(),
-              link: $(element).attr('href'),
+              link: $(element).attr('href') || "",
             })
           } else {
             Match.streams.push({
               name: $(element).text().trim(),
-              link: $(element).find('a').attr('href'),
+              link: $(element).find('a').attr('href') || "",
             })
           }
         })
@@ -76,7 +76,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           Match.teams.push({
             name: $(element).text().trim(),
             id: idGenerator(
-              $(element).parent().parent().attr('href')?.split('/')[2]
+              $(element).parent().parent().attr('href')?.split('/')[2] || ""
             ),
             mapScore: MapScore[i],
           })
