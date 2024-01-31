@@ -10,6 +10,7 @@ import { fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
+import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
 
 // Schemas
@@ -236,6 +237,7 @@ const EventTeamsRoute = {
     })
   },
 }
+
 // Untested
 //- Needs Schema Work
 const EventMatchesRoute = {
@@ -258,7 +260,7 @@ const EventMatchesRoute = {
     },
   }),
   handler: async (c: Context) => {
-    const Event = await fetchOneEvent(c.req.param('id'))
+    const Event = await fetchEventMatches(c.req.param('id'))
     return c.json<Object>({
       status: 'success',
       data: Event,
@@ -272,7 +274,7 @@ const ScoreRoute = {
     path: '/score/{id}',
     tags: ['Root Routes'],
     request: {
-      params: IDSchema
+      params: IDSchema,
     },
     responses: {
       200: {
@@ -280,18 +282,18 @@ const ScoreRoute = {
         content: {
           'application/json': {
             schema: EventSchema,
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   }),
   handler: async (c: Context) => {
-    const Score = await generateScore(c.req.param('id'));
+    const Score = await generateScore(c.req.param('id'))
     return c.json<Object>({
       status: 'success',
-      data: Score
+      data: Score,
     })
-  }
+  },
 }
 
 // Working!
@@ -340,5 +342,5 @@ export const Routes = [
   PlayerRoute,
   TeamRoute,
   ErrorRoute,
-  ScoreRoute
+  ScoreRoute,
 ]
