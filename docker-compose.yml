@@ -7,8 +7,8 @@ services:
     networks:
       - vlr_network
 
-  vlrapi2:
-    image: vlrapi2
+  fvlr_api:
+    image: fvlr_api:latest
     ports:
       - 9091:9091
     networks:
