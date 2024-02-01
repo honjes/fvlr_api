@@ -17,6 +17,7 @@ services:
       - redis
     environment:
       - DB_URI=redis://redis:6379
+      - PORT=9091
 
 networks:
   vlr_network:
