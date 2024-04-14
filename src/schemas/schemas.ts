@@ -13,8 +13,8 @@ export const regionsEnum = z.enum([
 export const typeEnum = z.enum(['Event', 'Match'])
 export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
 
-// TODO: move all typeExports heare
 // Util Objects
+// TODO: add openapi examples
 // Object for the stats of a player
 const statsObject = z
   .object({
@@ -179,7 +179,53 @@ const extStatsObject = z
   })
 export type ExtStats = z.infer<typeof extStatsObject>
 
+// Object for the team used in matches
+const teamObject = z.object({
+  name: z.string().openapi({
+    example: 'Team Liquid',
+  }),
+  id: z
+    .string()
+    .min(1)
+    .regex(/^[0-9]+$/) // Only numbers
+    .openapi({
+      example: '000000000001927',
+    }),
+  score: z.string().openapi({
+    example: '13',
+  }),
+})
+export type Team = z.infer<typeof teamObject>
+
+// Object for the team used in Game
+const teamObjectExtended = teamObject.extend({
+  players: z.array(z.string()),
+  scoreAdvanced: z.object({
+    t: z.number(),
+    ct: z.number(),
+    ot: z.number(),
+  }),
+})
+export type TeamExtended = z.infer<typeof teamObjectExtended>
+
+// Object for the game used in matches
+const gameObject = z.object({
+  map: z.string().openapi({
+    example: 'Bind',
+  }),
+  teams: z.array(teamObjectExtended),
+})
+export type Game = z.infer<typeof gameObject>
+
+// Object for the stream used in matches
+const streamObject = z.object({
+  name: z.string(),
+  link: z.string(),
+})
+export type Stream = z.infer<typeof streamObject>
+
 // Schemas
+// TODO: move all typeExports heare
 const IDType = z
   .string()
   .min(1)
@@ -225,47 +271,6 @@ const EventSchema = z
     }),
   })
   .array()
-
-const teamObject = z.object({
-  name: z.string().openapi({
-    example: 'Team Liquid',
-  }),
-  id: z
-    .string()
-    .min(1)
-    .regex(/^[0-9]+$/) // Only numbers
-    .openapi({
-      example: '000000000001927',
-    }),
-  score: z.string().openapi({
-    example: '13',
-  }),
-})
-export type Team = z.infer<typeof teamObject>
-
-const teamObjectExtended = teamObject.extend({
-  players: z.array(z.string()),
-  scoreAdvanced: z.object({
-    t: z.number(),
-    ct: z.number(),
-    ot: z.number(),
-  }),
-})
-export type TeamExtended = z.infer<typeof teamObjectExtended>
-
-const gameObject = z.object({
-  map: z.string().openapi({
-    example: 'Bind',
-  }),
-  teams: z.array(teamObjectExtended),
-})
-export type Game = z.infer<typeof gameObject>
-
-const streamObject = z.object({
-  name: z.string(),
-  link: z.string(),
-})
-export type Stream = z.infer<typeof streamObject>
 
 const playerSchema = z.object({
   name: z.string(),
