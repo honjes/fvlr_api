@@ -1,8 +1,16 @@
 import { z } from '@hono/zod-openapi'
 
 // Enums
-const regionsEnum = z.enum(['EU', 'NA', 'KR', 'BR', 'AP', 'LATAM', 'OCE'])
-const typeEnum = z.enum(['Event', 'Match'])
+export const regionsEnum = z.enum([
+  'EU',
+  'NA',
+  'KR',
+  'BR',
+  'AP',
+  'LATAM',
+  'OCE',
+])
+export const typeEnum = z.enum(['Event', 'Match'])
 
 // Types
 const IDType = z
