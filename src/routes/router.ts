@@ -102,8 +102,9 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
-      // console.log('test')
-      // return c.json<Match>({} as Match)
+      // validate Match ID
+      // make sure id is a string of numbers
+      if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
       const Match = await fetchOneMatch(c.req.param('id'))
       return c.json<Match>(Match)
     }

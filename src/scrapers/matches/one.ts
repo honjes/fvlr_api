@@ -20,10 +20,6 @@ import {
 export type Match = z.infer<typeof MatchSchema>
 
 const fetchOneMatch = async (id: string): Promise<Match> => {
-  // Validate input
-  // make sure id is a string of numbers
-  if (!id) return {}
-  else if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/${id}`)
