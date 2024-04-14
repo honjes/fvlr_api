@@ -2,6 +2,7 @@ import { z } from '@hono/zod-openapi'
 
 // Enums
 const regionsEnum = z.enum(['EU', 'NA', 'KR', 'BR', 'AP', 'LATAM', 'OCE'])
+const typeEnum = z.enum(['Event', 'Match'])
 
 // Types
 const IDType = z
@@ -18,7 +19,7 @@ const IDSchema = z.object({
 
 const EventSchema = z
   .object({
-    type: z.string().openapi({
+    type: typeEnum.openapi({
       example: 'Event',
     }),
     id: IDType,
@@ -81,8 +82,8 @@ const PlayerSchema = z.object({
 })
 // Schema for the /matches/{id} endpoint
 const MatchSchema = z.object({
-  type: z.string().openapi({
-    example: 'Match',
+  type: typeEnum.openapi({
+    example: 'Event',
   }),
   id: z
     .string()
