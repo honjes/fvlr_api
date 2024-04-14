@@ -23,6 +23,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
         let $ = load(data)
         const Match = new Object() as Match
 
+        Match.type = typeEnum.Enum.Match
         Match.id = id
         Match.date = $('.match-header-date .moment-tz-convert:nth-child(1)')
           .text()

@@ -19,7 +19,7 @@ const fetchAllEvents = (page: number = 1): Promise<Event> => {
         const $ = load(data)
         $('.event-item').each((i, element) => {
           const Event = {} as EventElement
-          Event.type = typeEnum.parse('Event')
+          Event.type = typeEnum.Enum.Event
           Event.link = `https://www.vlr.gg` + $(element).attr('href')
           Event.id = idGenerator(Event.link.split('/')[4])
           Event.name = $(element).find('.event-item-title').text().trim()
