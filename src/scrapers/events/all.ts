@@ -7,17 +7,18 @@ import { idGenerator } from '../util'
 import { z } from '@hono/zod-openapi'
 import { EventSchema } from '../../schemas/schemas'
 // Type
-type Event = z.infer<typeof EventSchema>
+export type Event = z.infer<typeof EventSchema>
+export type EventElement = z.infer<typeof EventSchema.element>
 
-const fetchAllEvents = (page: number = 1): Promise<Object> => {
+const fetchAllEvents = (page: number = 1): Promise<Event> => {
   return new Promise((resolve, reject) => {
-    const Events: Array<Event> = []
+    const Events: Event = []
     fetch(`https://www.vlr.gg/events/?page=${page}`)
       .then((response) => response.text())
       .then((data) => {
         const $ = load(data)
         $('.event-item').each((i, element) => {
-          const Event = {} as Event
+          const Event = {} as EventElement
           Event.type = 'event'
           Event.link = `https://www.vlr.gg` + $(element).attr('href')
           Event.id = idGenerator(Event.link.split('/')[4])
