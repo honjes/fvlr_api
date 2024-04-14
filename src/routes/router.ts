@@ -6,7 +6,7 @@ import { Context, Env } from 'hono'
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
-import { fetchAllMatches } from '../scrapers/matches/all'
+import { AllMatches, fetchAllMatches } from '../scrapers/matches/all'
 import { fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
@@ -14,7 +14,7 @@ import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
 
 // Schemas
-import { EventSchema, IDSchema } from '../schemas/schemas'
+import { AllMatchSchema, EventSchema, IDSchema } from '../schemas/schemas'
 
 // Types
 import { Event } from '../scrapers/events/all'
@@ -45,27 +45,31 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-const MatchesRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/matches',
-    tags: ['Root Routes'],
-    description: 'Fetches all events from the vlr.gg/matches page',
-    responses: {
-      200: {
-        description: 'Fetches all events from the /matches page',
-        content: {
-          'application/json': {
-            schema: EventSchema,
+// add All Routes related to Matches
+function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  // GET /matches
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/matches',
+      tags: ['Root Routes'],
+      description: 'Fetches all events from the vlr.gg/matches page',
+      responses: {
+        200: {
+          description: 'Fetches all events from the /matches page',
+          content: {
+            'application/json': {
+              schema: AllMatchSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Matches = await fetchAllMatches()
-    return c.json<Object>(Matches)
-  },
+    }),
+    async (c: Context) => {
+      const Matches = await fetchAllMatches()
+      return c.json<AllMatches>(Matches)
+    }
+  )
 }
 
 // Bad routes return successfully, but with empty params
@@ -338,6 +342,7 @@ const ErrorRoute = {
 
 export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   addEventsRoute(app)
+  addMatchRoutes(app)
 }
 
 /*export const Routes = [
