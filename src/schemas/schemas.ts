@@ -125,5 +125,13 @@ const MatchSchema = z.object({
     example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
 })
+// Schema for the /matches endpoint
+export const AllMatchSchema = z
+  .object({
+    date: z.string(),
+    today: z.boolean(),
+    matches: z.array(MatchSchema),
+  })
+  .array()
 
 export { IDSchema, EventSchema, MatchSchema }
