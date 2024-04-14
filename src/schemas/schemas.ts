@@ -11,6 +11,7 @@ export const regionsEnum = z.enum([
   'OCE',
 ])
 export const typeEnum = z.enum(['Event', 'Match'])
+export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
 
 // Util Objects
 // Object for the stats of a player
