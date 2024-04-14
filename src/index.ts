@@ -90,6 +90,17 @@ app.use('*', async (c, next) => {
     console.log('Not Cached Response')
     // Let the page generate as normal
     await next()
+    // check if the route was not found
+    if (c.res.status === 404) {
+      c.res = c.json(
+        {
+          status: 'error',
+          message: 'Route not found',
+        },
+        404
+      )
+      return
+    }
     // Intercept the JSON
     const data = await c.res.json()
     // Cache the response
