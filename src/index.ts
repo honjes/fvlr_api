@@ -12,7 +12,7 @@ const app = new OpenAPIHono()
 const client = createClient({
   url: DB_URI,
 })
-let CacheEnabled = true
+let CacheEnabled = process.env.CACHE_ENABLED || true
 let ConnectionCount = 0
 // CORS
 app.use(
