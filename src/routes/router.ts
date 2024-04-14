@@ -2,19 +2,25 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { createRoute } from '@hono/zod-openapi'
 import { Context, Env } from 'hono'
+import { validator } from 'hono/validator'
 
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
 import { AllMatches, fetchAllMatches } from '../scrapers/matches/all'
-import { fetchOneMatch } from '../scrapers/matches/one'
+import { Match, fetchOneMatch } from '../scrapers/matches/one'
 import { fetchOnePlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
 import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
 
 // Schemas
-import { AllMatchSchema, EventSchema, IDSchema } from '../schemas/schemas'
+import {
+  AllMatchSchema,
+  EventSchema,
+  IDSchema,
+  MatchSchema,
+} from '../schemas/schemas'
 
 // Types
 import { Event } from '../scrapers/events/all'
@@ -70,36 +76,38 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       return c.json<AllMatches>(Matches)
     }
   )
-}
 
-// Bad routes return successfully, but with empty params
-// This is because Matches and Form Threads are both using root ids
-// vlr.gg/{id}
-//- Needs Schema Work
-const MatchRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/match/{id}',
-    tags: ['Root Routes'],
-    request: {
-      params: IDSchema,
-    },
-    description: 'Fetches a Match based on the Match ID from vlr.gg',
-    responses: {
-      200: {
-        description: 'Fetches a Match based on the Match ID from vlr.gg',
-        content: {
-          'application/json': {
-            schema: EventSchema,
+  // GET /match/{id}
+  // Bad routes return successfully, but with empty params
+  // This is because Matches and Form Threads are both using root ids
+  // vlr.gg/{id}
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/match/{id}',
+      tags: ['Root Routes'],
+      request: {
+        params: IDSchema,
+      },
+      description: 'Fetches a Match based on the Match ID from vlr.gg',
+      responses: {
+        200: {
+          description: 'Fetches a Match based on the Match ID from vlr.gg',
+          content: {
+            'application/json': {
+              schema: MatchSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Match = await fetchOneMatch(c.req.param('id'))
-    return c.json<Object>(Match)
-  },
+    }),
+    async (c: Context) => {
+      // console.log('test')
+      // return c.json<Match>({} as Match)
+      const Match = await fetchOneMatch(c.req.param('id'))
+      return c.json<Match>(Match)
+    }
+  )
 }
 
 // Works Perfectly!
