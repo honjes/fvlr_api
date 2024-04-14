@@ -1,5 +1,9 @@
 import { z } from '@hono/zod-openapi'
 
+// Enums
+const regionsEnum = z.enum(['EU', 'NA', 'KR', 'BR', 'AP', 'LATAM', 'OCE'])
+
+// Types
 const IDType = z
   .string()
   .min(1)
@@ -37,12 +41,9 @@ const EventSchema = z
     prize: z.string().openapi({
       example: '$250,000',
     }),
-    region: z
-      .string()
-      .regex(/EU||NA||KR||BR||AP||LATAM||OCE/)
-      .openapi({
-        example: 'EU',
-      }),
+    region: regionsEnum.openapi({
+      example: 'EU',
+    }),
     logo: z.string().openapi({
       example: 'https://owcdn.net/img/6009f963577f4.png',
     }),
@@ -78,6 +79,7 @@ const PlayerSchema = z.object({
   name: z.string(),
   link: z.string(),
 })
+// Schema for the /matches/{id} endpoint
 const MatchSchema = z.object({
   type: z.string().openapi({
     example: 'Match',
@@ -115,12 +117,9 @@ const MatchSchema = z.object({
   prize: z.string().openapi({
     example: '$250,000',
   }),
-  region: z
-    .string()
-    .regex(/EU||NA||KR||BR||AP||LATAM||OCE/)
-    .openapi({
-      example: 'EU',
-    }),
+  region: regionsEnum.openapi({
+    example: 'EU',
+  }),
   logo: z.string().openapi({
     example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
