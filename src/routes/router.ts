@@ -1,7 +1,7 @@
 // OPENAPI's FACE ya DINK
-import { z } from '@hono/zod-openapi'
+import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { createRoute } from '@hono/zod-openapi'
-import { Context } from 'hono'
+import { Context, Env } from 'hono'
 
 // Scrappy Doo
 import { fetchAllEvents } from '../scrapers/events/all'
@@ -16,28 +16,33 @@ import { generateScore } from '../scrapers/matches/score'
 // Schemas
 import { EventSchema, IDSchema } from '../schemas/schemas'
 
+// Types
+import { Event } from '../scrapers/events/all'
+
 // Works Perfectly
-const EventsRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/events',
-    tags: ['Root Routes'],
-    description: 'Fetches all events from the vlr.gg/events page',
-    responses: {
-      200: {
-        description: 'Fetches all events from the /events page',
-        content: {
-          'application/json': {
-            schema: EventSchema,
+function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/events',
+      tags: ['Root Routes'],
+      description: 'Fetches all events from the vlr.gg/events page',
+      responses: {
+        200: {
+          description: 'Fetches all events from the /events page',
+          content: {
+            'application/json': {
+              schema: EventSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Events = await fetchAllEvents()
-    return c.json<Object>(Events)
-  },
+    }),
+    async (c: Context) => {
+      const Events = await fetchAllEvents()
+      return c.json<Event>(Events)
+    }
+  )
 }
 
 const MatchesRoute = {
@@ -331,7 +336,11 @@ const ErrorRoute = {
   },
 }
 
-export const Routes = [
+export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  addEventsRoute(app)
+}
+
+/*export const Routes = [
   EventsRoute,
   EventRoute,
   EventPlayersRoute,
@@ -343,4 +352,4 @@ export const Routes = [
   TeamRoute,
   ErrorRoute,
   ScoreRoute,
-]
+]*/

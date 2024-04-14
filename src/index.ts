@@ -1,8 +1,8 @@
 // Vlr2 API with HONO and Redis
-import { OpenAPIHono } from '@hono/zod-openapi'
+import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
-import { Routes } from './routes/router'
+import addRoutes from './routes/router'
 import { createClient } from 'redis'
 import 'dotenv/config'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
@@ -127,13 +127,12 @@ app.use('/', async (c, next) => {
 })
 
 // Routes
-Routes.forEach((route) => {
 /*Routes.forEach((route) => {
   app.openapi(route.route, (c) => {
     return route.handler(c)
   })
-})
 })*/
+addRoutes(app)
 
 // Swagger UI
 app.get(
