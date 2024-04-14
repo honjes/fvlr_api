@@ -6,11 +6,11 @@ import { idGenerator } from '../util'
 import { fetchOneMatch } from './one'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { MatchSchema } from '../../schemas/schemas'
+import { AllMatchSchema } from '../../schemas/schemas'
 // Type
-type Match = z.infer<typeof MatchSchema>
+export type AllMatches = z.infer<typeof AllMatchSchema>
 
-const fetchAllMatches = async () => {
+const fetchAllMatches = async (): Promise<AllMatches> => {
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/matches`)
@@ -18,7 +18,7 @@ const fetchAllMatches = async () => {
       .then((data) => {
         // parse the page
         let $ = load(data)
-        let Matches = new Array()
+        let Matches: AllMatches = new Array()
         const Labels = $(
           '#wrapper > div.col-container > div:nth-child(1) > .wf-label.mod-large'
         )
@@ -43,7 +43,7 @@ const fetchAllMatches = async () => {
               const link = $(match).attr('href')
               if (!link) return
               const id = idGenerator(link.split('/')[1])
-              // Should run this through  the cache instead,
+              // Should run this through the cache instead,
               // Fix later
               MatchPulls.push(
                 fetchOneMatch(id).then((data) => {
