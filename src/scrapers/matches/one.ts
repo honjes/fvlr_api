@@ -9,9 +9,9 @@ import {
   ExtStats,
   Game,
   MatchSchema,
-  Player,
+  PlayerBaseElement,
+  PlayerMatchStatsElement,
   Stats,
-  Team,
   TeamExtended,
   statusEnum,
   typeEnum,
@@ -142,7 +142,7 @@ const fetchOneMatch = async (id: string): Promise<Match> => {
                   .trim() == ''
               )
                 return
-              const player = new Object() as Player
+              const player = new Object() as PlayerMatchStatsElement
               player.name = $(element)
                 .find('.mod-player a div:nth-child(1)')
                 .text()

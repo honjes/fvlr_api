@@ -224,6 +224,20 @@ const streamObject = z.object({
 })
 export type Stream = z.infer<typeof streamObject>
 
+export const playerMatchStatsObject = z.object({
+  name: z.string(),
+  team: z.string(),
+  link: z.string(),
+  stats: statsObject,
+  statsAdvanced: extStatsObject,
+})
+export const playerMatchStatsArraySchema = playerMatchStatsObject.array()
+
+export type PlayerMatchStats = z.infer<typeof playerMatchStatsArraySchema>
+export type PlayerMatchStatsElement = z.infer<
+  typeof playerMatchStatsArraySchema.element
+>
+
 // Schemas
 // TODO: move all typeExports heare
 const IDType = z
@@ -313,7 +327,7 @@ const MatchSchema = z.object({
   }),
   games: z.array(gameObject),
   teams: z.array(teamObject),
-  players: z.array(playerSchema),
+  players: playerMatchStatsArraySchema,
 })
 // Schema for the /matches endpoint
 export const AllMatchSchema = z
