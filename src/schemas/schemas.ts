@@ -292,6 +292,10 @@ const MatchSchema = z.object({
     .openapi({
       example: '000000000001927',
     }),
+  link: z.string().openapi({
+    example:
+      'https://www.vlr.gg/314629/sentinels-vs-leviat-n-champions-tour-2024-americas-stage-1-w2/?game=163369&tab=overview',
+  }),
   date: z.string().openapi({
     example: 'Dec 22—30',
   }),
@@ -310,13 +314,6 @@ const MatchSchema = z.object({
   games: z.array(gameObject),
   teams: z.array(teamObject),
   players: z.array(playerSchema),
-  link: z.string().openapi({
-    example:
-      'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',
-  }),
-  name: z.string().openapi({
-    example: 'Champions Tour 2023 China: Ascension',
-  }),
 })
 // Schema for the /matches endpoint
 export const AllMatchSchema = z
