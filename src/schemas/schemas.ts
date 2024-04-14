@@ -13,6 +13,7 @@ export const regionsEnum = z.enum([
 export const typeEnum = z.enum(['Event', 'Match'])
 export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
 
+// TODO: move all typeExports heare
 // Util Objects
 // Object for the stats of a player
 const statsObject = z
@@ -225,7 +226,7 @@ const EventSchema = z
   })
   .array()
 
-const TeamSchema = z.object({
+const teamObject = z.object({
   name: z.string().openapi({
     example: 'Team Liquid',
   }),
@@ -236,24 +237,44 @@ const TeamSchema = z.object({
     .openapi({
       example: '000000000001927',
     }),
-  mapScore: z.string().openapi({
+  score: z.string().openapi({
     example: '13',
   }),
 })
-const GameSchema = z.object({
+export type Team = z.infer<typeof teamObject>
+
+const teamObjectExtended = teamObject.extend({
+  players: z.array(z.string()),
+  scoreAdvanced: z.object({
+    t: z.number(),
+    ct: z.number(),
+    ot: z.number(),
+  }),
+})
+export type TeamExtended = z.infer<typeof teamObjectExtended>
+
+const gameObject = z.object({
   map: z.string().openapi({
     example: 'Bind',
   }),
-  teams: z.array(TeamSchema),
+  teams: z.array(teamObjectExtended),
 })
-const StreamSchema = z.object({
+export type Game = z.infer<typeof gameObject>
+
+const streamObject = z.object({
   name: z.string(),
   link: z.string(),
 })
-const PlayerSchema = z.object({
+export type Stream = z.infer<typeof streamObject>
+
+const playerSchema = z.object({
   name: z.string(),
+  team: z.string(),
   link: z.string(),
+  stats: statsObject,
+  statsAdvanced: extStatsObject,
 })
+export type Player = z.infer<typeof playerSchema>
 // Schema for the /matches/{id} endpoint
 const MatchSchema = z.object({
   type: typeEnum.openapi({
@@ -266,37 +287,30 @@ const MatchSchema = z.object({
     .openapi({
       example: '000000000001927',
     }),
-  time: z.string(),
-  event: z.string(), // ID or 0
-  eventname: z.string(),
-  streams: z.array(StreamSchema),
-  players: z.array(PlayerSchema),
-  games: z.array(GameSchema),
-  teams: z.array(TeamSchema),
+  date: z.string().openapi({
+    example: 'Dec 22—30',
+  }),
+  time: z.string().openapi({
+    example: '1:25 AM CEST',
+  }),
+  eventId: IDType, // ID or 0
+  eventName: z.string(),
+  logo: z.string().openapi({
+    example: 'https://owcdn.net/img/6009f963577f4.png',
+  }),
+  streams: z.array(streamObject),
+  status: statusEnum.openapi({
+    example: statusEnum.enum.Completed,
+  }),
+  games: z.array(gameObject),
+  teams: z.array(teamObject),
+  players: z.array(playerSchema),
   link: z.string().openapi({
     example:
       'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',
   }),
   name: z.string().openapi({
     example: 'Champions Tour 2023 China: Ascension',
-  }),
-  date: z.string().openapi({
-    example: 'Dec 22—30',
-  }),
-  status: z
-    .string()
-    .regex(/New||Ongoing||Completed/)
-    .openapi({
-      example: 'completed',
-    }),
-  prize: z.string().openapi({
-    example: '$250,000',
-  }),
-  region: regionsEnum.openapi({
-    example: 'EU',
-  }),
-  logo: z.string().openapi({
-    example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
 })
 // Schema for the /matches endpoint
