@@ -128,10 +128,12 @@ app.use('/', async (c, next) => {
 
 // Routes
 Routes.forEach((route) => {
+/*Routes.forEach((route) => {
   app.openapi(route.route, (c) => {
     return route.handler(c)
   })
 })
+})*/
 
 // Swagger UI
 app.get(
