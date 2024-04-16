@@ -10,7 +10,7 @@ export const regionsEnum = z.enum([
   'LATAM',
   'OCE',
 ])
-export const typeEnum = z.enum(['Event', 'Match'])
+export const typeEnum = z.enum(['Event', 'Match', 'Player', 'Team'])
 export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
 export const timeEnum = z.enum(['t30', 't60', 't90', 'tall'])
 
@@ -319,6 +319,57 @@ export const shortEventSchema = z
     }),
   })
   .array()
+
+// Schema for the /event/{id} endpoint
+export const eventSchema = z.object({
+  type: typeEnum.openapi({
+    example: 'Event',
+  }),
+  id: IDType,
+  name: z.string().openapi({
+    example: 'Champions Tour 2023 China: Ascension',
+  }),
+  link: z.string().openapi({
+    example:
+      'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',
+  }),
+  logo: z.string().openapi({
+    example: 'https://owcdn.net/img/6009f963577f4.png',
+  }),
+  teams_item: z.array(
+    z.object({
+      name: z.string(),
+      logo: z.string(),
+      link: z.string(),
+      id: IDType,
+      players: z.array(
+        z.object({
+          type: typeEnum,
+          ign: z.string(),
+          link: z.string(),
+          id: IDType,
+        })
+      ),
+      status: z.string(),
+    })
+  ),
+  players_item: z.array(
+    z.object({
+      type: typeEnum,
+      ign: z.string(),
+      name: z.string(),
+      link: z.string(),
+      id: IDType,
+      team: z.object({
+        type: typeEnum,
+        name: z.string(),
+        id: IDType,
+      }),
+    })
+  ),
+  failed_links: z.array(z.string()),
+})
+export type Event = z.infer<typeof eventSchema>
 
 // Schema for the /players/{id} endpoint
 export const playerSchema = z.object({
