@@ -407,6 +407,26 @@ export const eventSchema = z.object({
 })
 export type Event = z.infer<typeof eventSchema>
 
+// Schema for the /event/{id}/match endpoint
+export const eventMatchesSchema = z.object({
+  type: typeEnum.openapi({
+    example: 'Event',
+  }),
+  name: z.string().openapi({
+    example: 'Champions Tour 2023 China: Ascension',
+  }),
+  link: z.string().openapi({
+    example:
+      'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',
+  }),
+  id: IDType,
+  img: z.string().openapi({
+    example: 'https://owcdn.net/img/6009f963577f4.png',
+  }),
+  matches: MatchSchema.array(),
+})
+export type EventMatches = z.infer<typeof eventMatchesSchema>
+
 // Schema for the /players/{id} endpoint
 export const playerSchema = z.object({
   ign: z.string(),
