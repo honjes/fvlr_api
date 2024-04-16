@@ -21,7 +21,9 @@ import {
   IDSchema,
   MatchSchema,
   Player,
+  Team,
   playerSchema,
+  teamSchema,
 } from '../schemas/schemas'
 
 // Types
@@ -144,8 +146,42 @@ function addPlayerRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-// Works Perfectly!
-//- Needs Schema Work
+// add All Team Routes
+function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  // GET /team/{id}
+  // Works Perfectly!
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/team/{id}',
+      tags: ['Root Routes'],
+      request: {
+        params: IDSchema,
+      },
+      description: 'Fetches a Team based on their ID from vlr.gg',
+      responses: {
+        200: {
+          description: 'Fetches a Team based on their ID from vlr.gg',
+          content: {
+            'application/json': {
+              schema: teamSchema,
+            },
+          },
+        },
+      },
+    }),
+    async (c: Context) => {
+      const id = c.req.param('id')
+      // Validate input
+      // make sure id is a string of numbers
+      if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')
+
+      const Team = await fetchOneTeam(id)
+      return c.json<Team>(Team)
+    }
+  )
+}
+
 const TeamRoute = {
   route: createRoute({
     method: 'get',
@@ -357,6 +393,7 @@ export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   addEventsRoute(app)
   addMatchRoutes(app)
   addPlayerRoutes(app)
+  addTeamRoutes(app)
 }
 
 /*export const Routes = [
