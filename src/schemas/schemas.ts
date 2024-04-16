@@ -286,7 +286,7 @@ const IDSchema = z.object({
 })
 
 // Schema for the /events endpoint
-export const EventSchema = z
+export const shortEventSchema = z
   .object({
     type: typeEnum.openapi({
       example: 'Event',

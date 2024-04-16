@@ -5,11 +5,11 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { EventSchema } from '../../schemas/schemas'
+import { shortEventSchema } from '../../schemas/schemas'
 import { fetchOneMatch } from '../matches/one'
 import { generateScore } from '../matches/score'
 // Type
-type Event = z.infer<typeof EventSchema>
+type Event = z.infer<typeof shortEventSchema>
 
 const fetchEventMatches = async (id: string): Promise<Object> => {
   // Validate input

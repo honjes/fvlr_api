@@ -17,7 +17,7 @@ import { generateScore } from '../scrapers/matches/score'
 // Schemas
 import {
   AllMatchSchema,
-  EventSchema,
+  shortEventSchema,
   IDSchema,
   MatchSchema,
   Player,
@@ -27,7 +27,7 @@ import {
 } from '../schemas/schemas'
 
 // Types
-import { Event } from '../scrapers/events/all'
+import { ShortEvent } from '../scrapers/events/all'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
@@ -42,7 +42,7 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
           description: 'Fetches all events from the /events page',
           content: {
             'application/json': {
-              schema: EventSchema,
+              schema: shortEventSchema,
             },
           },
         },

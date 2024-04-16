@@ -5,20 +5,20 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { EventSchema, regionsEnum, typeEnum } from '../../schemas/schemas'
+import { shortEventSchema, regionsEnum, typeEnum } from '../../schemas/schemas'
 // Type
-export type Event = z.infer<typeof EventSchema>
-export type EventElement = z.infer<typeof EventSchema.element>
+export type ShortEvent = z.infer<typeof shortEventSchema>
+export type ShortEventElement = z.infer<typeof shortEventSchema.element>
 
-const fetchAllEvents = (page: number = 1): Promise<Event> => {
+const fetchAllEvents = (page: number = 1): Promise<ShortEvent> => {
   return new Promise((resolve, reject) => {
-    const Events: Event = []
+    const Events: ShortEvent = []
     fetch(`https://www.vlr.gg/events/?page=${page}`)
       .then((response) => response.text())
       .then((data) => {
         const $ = load(data)
         $('.event-item').each((i, element) => {
-          const Event = {} as EventElement
+          const Event = {} as ShortEventElement
           Event.type = typeEnum.Enum.Event
           Event.link = `https://www.vlr.gg` + $(element).attr('href')
           Event.id = idGenerator(Event.link.split('/')[4])
