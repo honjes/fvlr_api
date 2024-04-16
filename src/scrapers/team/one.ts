@@ -113,7 +113,7 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
         ]
         let Players = await Promise.all(PlayerPromises)
         Players = await Promise.all(Players.map((res) => res.json()))
-        Team.players = Players.map((player) => player.data[0]);
+        Team.players = Players.map((player) => player.data)
         delete Team.players_item
         // Generate team.staff array of ids
         Team.staff = new Array()
