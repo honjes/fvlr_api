@@ -257,20 +257,18 @@ const streamObject = z.object({
 })
 export type Stream = z.infer<typeof streamObject>
 
-// Object for the player stats in a match
-export const playerMatchStatsObject = z
-  .object({
-    name: z.string(),
-    team: z.string(),
-    link: z.string(),
-    stats: playerStatsObject,
-    statsAdvanced: extStatsObject,
-  })
-  .array()
+export const playerMatchStatsObject = z.object({
+  name: z.string(),
+  team: z.string(),
+  link: z.string(),
+  stats: playerStatsObject,
+  statsAdvanced: extStatsObject,
+})
+export const playerMatchStatsArraySchema = playerMatchStatsObject.array()
 
-export type PlayerMatchStats = z.infer<typeof playerMatchStatsObject>
+export type PlayerMatchStats = z.infer<typeof playerMatchStatsArraySchema>
 export type PlayerMatchStatsElement = z.infer<
-  typeof playerMatchStatsObject.element
+  typeof playerMatchStatsArraySchema.element
 >
 
 // Schemas
