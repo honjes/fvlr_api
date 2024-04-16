@@ -24,6 +24,8 @@ import {
   Team,
   playerSchema,
   teamSchema,
+  eventSchema,
+  Event,
 } from '../schemas/schemas'
 
 // Types
@@ -31,6 +33,7 @@ import { ShortEvent } from '../scrapers/events/all'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
+  // GET /events
   app.openapi(
     createRoute({
       method: 'get',
@@ -50,7 +53,40 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     }),
     async (c: Context) => {
       const Events = await fetchAllEvents()
-      return c.json<Event>(Events)
+      return c.json<ShortEvent>(Events)
+    }
+  )
+
+  // GET /event/{id}
+  app.openapi(
+    {
+      method: 'get',
+      path: '/event/{id}',
+      tags: ['Event Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Fetches a specific event',
+          content: {
+            'application/json': {
+              schema: eventSchema,
+            },
+          },
+        },
+      },
+    },
+    async (c: Context) => {
+      const id = c.req.param('id')
+      // Validate input
+      // make sure id is a string of numbers
+      if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
+
+      const Event = await fetchOneEvent(id).catch((err) => {
+        throw Error(err)
+      })
+      return c.json<Event>(Event)
     }
   )
 }
@@ -182,33 +218,6 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-const TeamRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/team/{id}',
-    tags: ['Root Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches all events from the /events page',
-        content: {
-          'application/json': {
-            schema: EventSchema,
-          },
-        },
-      },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Team = await fetchOneTeam(c.req.param('id')).catch((err) => {
-      throw Error(err)
-    })
-    return c.json<Object>(Team)
-  },
-}
-
 // Works Perfectly!
 //- Needs Schema Work
 const EventRoute = {
@@ -224,7 +233,7 @@ const EventRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSchema,
+            schema: shortEventSchema,
           },
         },
       },
@@ -252,7 +261,7 @@ const EventPlayersRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSchema,
+            schema: shortEventSchema,
           },
         },
       },
@@ -281,7 +290,7 @@ const EventTeamsRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSchema,
+            schema: shortEventSchema,
           },
         },
       },
@@ -311,7 +320,7 @@ const EventMatchesRoute = {
         description: 'Fetches a specific event',
         content: {
           'application/json': {
-            schema: EventSchema,
+            schema: shortEventSchema,
           },
         },
       },
@@ -339,7 +348,7 @@ const ScoreRoute = {
         description: 'Generates the score for a given match',
         content: {
           'application/json': {
-            schema: EventSchema,
+            schema: shortEventSchema,
           },
         },
       },
