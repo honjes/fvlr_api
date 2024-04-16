@@ -9,9 +9,8 @@ import {
   ExtStats,
   Game,
   MatchSchema,
-  PlayerBaseElement,
   PlayerMatchStatsElement,
-  Stats,
+  PlayerStats,
   TeamExtended,
   statusEnum,
   typeEnum,
@@ -156,7 +155,7 @@ const fetchOneMatch = async (id: string): Promise<Match> => {
                 .attr('href')}`
               const playerStats = $(element).find('.mod-stat')
               player.statsAdvanced = new Object() as ExtStats
-              player.stats = new Object() as Stats
+              player.stats = new Object() as PlayerStats
               playerStats.each((i, element) => {
                 const ct = $(element).find('.mod-ct').text().trim()
                 const t = $(element).find('.mod-t').text().trim()

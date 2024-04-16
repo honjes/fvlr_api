@@ -16,7 +16,7 @@ export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
 // Util Objects
 // TODO: add openapi examples
 // Object for the stats of a player
-const statsObject = z
+const playerStatsObject = z
   .object({
     kdr: z.string(),
     acs: z.string(),
@@ -47,7 +47,7 @@ const statsObject = z
       fkdb: '0',
     },
   })
-export type Stats = z.infer<typeof statsObject>
+export type PlayerStats = z.infer<typeof playerStatsObject>
 
 // Object for the stats of a player per site
 const extStatsObject = z
@@ -228,7 +228,7 @@ export const playerMatchStatsObject = z.object({
   name: z.string(),
   team: z.string(),
   link: z.string(),
-  stats: statsObject,
+  stats: playerStatsObject,
   statsAdvanced: extStatsObject,
 })
 export const playerMatchStatsArraySchema = playerMatchStatsObject.array()
