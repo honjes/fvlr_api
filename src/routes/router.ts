@@ -89,6 +89,60 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       return c.json<Event>(Event)
     }
   )
+
+  // same as above, but with a different route
+  // GET /event/{id}/players
+  app.openapi(
+    {
+      method: 'get',
+      path: '/event/{id}/players',
+      tags: ['Event Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Fetches a specific event',
+          content: {
+            'application/json': {
+              schema: eventSchema,
+            },
+          },
+        },
+      },
+    },
+    async (c: Context) => {
+      const Event = await fetchOneEvent(c.req.param('id'))
+      return c.json<Event>(Event)
+    }
+  )
+
+  // same as above, but with a different route
+  // GET /event/{id}/teams
+  app.openapi(
+    {
+      method: 'get',
+      path: '/event/{id}/teams',
+      tags: ['Event Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Fetches a specific event',
+          content: {
+            'application/json': {
+              schema: eventSchema,
+            },
+          },
+        },
+      },
+    },
+    async (c: Context) => {
+      const Event = await fetchOneEvent(c.req.param('id'))
+      return c.json<Event>(Event)
+    }
+  )
 }
 
 // add All Routes related to Matches
@@ -154,7 +208,6 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
 // add All Player Routes
 function addPlayerRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   // GET /player/{id}
-  // Works Perfectly!
   app.openapi(
     createRoute({
       method: 'get',
@@ -185,7 +238,6 @@ function addPlayerRoutes(app: OpenAPIHono<Env, {}, '/'>) {
 // add All Team Routes
 function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   // GET /team/{id}
-  // Works Perfectly!
   app.openapi(
     createRoute({
       method: 'get',
@@ -216,93 +268,6 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       return c.json<Team>(Team)
     }
   )
-}
-
-// Works Perfectly!
-//- Needs Schema Work
-const EventRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/event/{id}',
-    tags: ['Event Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches a specific event',
-        content: {
-          'application/json': {
-            schema: shortEventSchema,
-          },
-        },
-      },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Event = await fetchOneEvent(c.req.param('id')).catch((err) => {
-      throw Error(err)
-    })
-    return c.json<Object>(Event)
-  },
-}
-// Untested
-//- Needs Schema Work
-const EventPlayersRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/event/{id}/players',
-    tags: ['Event Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches a specific event',
-        content: {
-          'application/json': {
-            schema: shortEventSchema,
-          },
-        },
-      },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Event = await fetchOneEvent(c.req.param('id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Event,
-    })
-  },
-}
-// Untested
-//- Needs Schema Work
-const EventTeamsRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/event/{id}/teams',
-    tags: ['Event Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches a specific event',
-        content: {
-          'application/json': {
-            schema: shortEventSchema,
-          },
-        },
-      },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Event = await fetchOneEvent(c.req.param('id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Event,
-    })
-  },
 }
 
 // Untested

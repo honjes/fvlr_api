@@ -1,5 +1,5 @@
 // Vlr2 API with HONO and Redis
-import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
+import { OpenAPIHono } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import addRoutes from './routes/router'
