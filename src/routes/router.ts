@@ -26,6 +26,8 @@ import {
   teamSchema,
   eventSchema,
   Event,
+  eventMatchesSchema,
+  EventMatches,
 } from '../schemas/schemas'
 
 // Types
@@ -141,6 +143,37 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     async (c: Context) => {
       const Event = await fetchOneEvent(c.req.param('id'))
       return c.json<Event>(Event)
+    }
+  )
+
+  // GET /event/{id}/matches
+  app.openapi(
+    {
+      method: 'get',
+      path: '/event/{id}/matches',
+      tags: ['Event Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Fetches matches of a specific event',
+          content: {
+            'application/json': {
+              schema: eventMatchesSchema,
+            },
+          },
+        },
+      },
+    },
+    async (c: Context) => {
+      const id = c.req.param('id')
+      // Validate input
+      // make sure id is a string of numbers
+      if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
+
+      const Event = await fetchEventMatches(id)
+      return c.json<EventMatches>(Event)
     }
   )
 }
@@ -268,36 +301,6 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       return c.json<Team>(Team)
     }
   )
-}
-
-// Untested
-//- Needs Schema Work
-const EventMatchesRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/event/{id}/matches',
-    tags: ['Event Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches a specific event',
-        content: {
-          'application/json': {
-            schema: shortEventSchema,
-          },
-        },
-      },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Event = await fetchEventMatches(c.req.param('id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Event,
-    })
-  },
 }
 
 const ScoreRoute = {
