@@ -3,11 +3,7 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
-// Schema
-import { z } from '@hono/zod-openapi'
-import { TeamSchema } from '../../schemas/schemas'
-// Type
-type Team = z.infer<typeof TeamSchema>
+import { PORT } from '../..'
 
 const fetchOneTeam = async (id: string): Promise<Object> => {
   // Validate input
@@ -109,10 +105,10 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
         // SICK way of keeping players cached ;)
         const PlayerPromises = [
           ...Team.players_item.map((player) => {
-            return fetch('http://localhost:3000/player/' + player.id)
+            return fetch(`http://localhost:${PORT}/player/${player.id}`)
           }),
           ...Team.staff_item.map((player) => {
-            return fetch('http://localhost:3000/player/' + player.id)
+            return fetch(`http://localhost:${PORT}/player/${player.id}`)
           }),
         ]
         let Players = await Promise.all(PlayerPromises)
