@@ -285,6 +285,42 @@ const IDSchema = z.object({
   id: IDType,
 })
 
+// Schema for the /matches/{id} endpoint
+export const MatchSchema = z.object({
+  type: typeEnum.openapi({
+    example: 'Event',
+  }),
+  id: z
+    .string()
+    .min(1)
+    .regex(/^[0-9]+$/) // Only numbers
+    .openapi({
+      example: '000000000001927',
+    }),
+  link: z.string().openapi({
+    example:
+      'https://www.vlr.gg/314629/sentinels-vs-leviat-n-champions-tour-2024-americas-stage-1-w2/?game=163369&tab=overview',
+  }),
+  date: z.string().openapi({
+    example: 'Dec 22—30',
+  }),
+  time: z.string().openapi({
+    example: '1:25 AM CEST',
+  }),
+  eventId: IDType, // ID or 0
+  eventName: z.string(),
+  logo: z.string().openapi({
+    example: 'https://owcdn.net/img/6009f963577f4.png',
+  }),
+  streams: z.array(streamObject),
+  status: statusEnum.openapi({
+    example: statusEnum.enum.Completed,
+  }),
+  games: z.array(gameObject),
+  teams: z.array(gameTeamObject),
+  players: playerMatchStatsArraySchema,
+})
+
 // Schema for the /events endpoint
 export const shortEventSchema = z
   .object({
@@ -436,42 +472,6 @@ export const teamSchema = z.object({
   ),
 })
 export type Team = z.infer<typeof teamSchema>
-
-// Schema for the /matches/{id} endpoint
-export const MatchSchema = z.object({
-  type: typeEnum.openapi({
-    example: 'Event',
-  }),
-  id: z
-    .string()
-    .min(1)
-    .regex(/^[0-9]+$/) // Only numbers
-    .openapi({
-      example: '000000000001927',
-    }),
-  link: z.string().openapi({
-    example:
-      'https://www.vlr.gg/314629/sentinels-vs-leviat-n-champions-tour-2024-americas-stage-1-w2/?game=163369&tab=overview',
-  }),
-  date: z.string().openapi({
-    example: 'Dec 22—30',
-  }),
-  time: z.string().openapi({
-    example: '1:25 AM CEST',
-  }),
-  eventId: IDType, // ID or 0
-  eventName: z.string(),
-  logo: z.string().openapi({
-    example: 'https://owcdn.net/img/6009f963577f4.png',
-  }),
-  streams: z.array(streamObject),
-  status: statusEnum.openapi({
-    example: statusEnum.enum.Completed,
-  }),
-  games: z.array(gameObject),
-  teams: z.array(gameTeamObject),
-  players: playerMatchStatsArraySchema,
-})
 
 // Schema for the /matches endpoint
 export const AllMatchSchema = z
