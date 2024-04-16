@@ -11,7 +11,7 @@ import {
   MatchSchema,
   PlayerMatchStatsElement,
   PlayerStats,
-  TeamExtended,
+  GameTeamExtended,
   statusEnum,
   typeEnum,
 } from '../../schemas/schemas'
@@ -116,8 +116,8 @@ const fetchOneMatch = async (id: string): Promise<Match> => {
           // TODO: make map a enum
           Match.games[i].map = map
           Match.games[i].teams = new Array()
-          Match.games[i].teams[0] = new Object() as TeamExtended
-          Match.games[i].teams[1] = new Object() as TeamExtended
+          Match.games[i].teams[0] = new Object() as GameTeamExtended
+          Match.games[i].teams[1] = new Object() as GameTeamExtended
           Match.games[i].teams[0].name = Match.teams[0].name
           Match.games[i].teams[1].name = Match.teams[1].name
           //TODO: scrape Scores

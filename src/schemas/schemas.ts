@@ -213,7 +213,7 @@ export const playerAgentStatsObject = z.object({
 export type PlayerAgentStats = z.infer<typeof playerAgentStatsObject>
 
 // Object for the team used in matches
-const teamObject = z.object({
+const gameTeamObject = z.object({
   name: z.string().openapi({
     example: 'Team Liquid',
   }),
@@ -228,10 +228,10 @@ const teamObject = z.object({
     example: '13',
   }),
 })
-export type Team = z.infer<typeof teamObject>
+export type GameTeam = z.infer<typeof gameTeamObject>
 
 // Object for the team used in Game
-const teamObjectExtended = teamObject.extend({
+const gameTeamExtendedObject = gameTeamObject.extend({
   players: z.array(z.string()),
   scoreAdvanced: z.object({
     t: z.number(),
@@ -239,14 +239,14 @@ const teamObjectExtended = teamObject.extend({
     ot: z.number(),
   }),
 })
-export type TeamExtended = z.infer<typeof teamObjectExtended>
+export type GameTeamExtended = z.infer<typeof gameTeamExtendedObject>
 
 // Object for the game used in matches
 const gameObject = z.object({
   map: z.string().openapi({
     example: 'Bind',
   }),
-  teams: z.array(teamObjectExtended),
+  teams: z.array(gameTeamExtendedObject),
 })
 export type Game = z.infer<typeof gameObject>
 
@@ -395,9 +395,10 @@ export const MatchSchema = z.object({
     example: statusEnum.enum.Completed,
   }),
   games: z.array(gameObject),
-  teams: z.array(teamObject),
+  teams: z.array(gameTeamObject),
   players: playerMatchStatsArraySchema,
 })
+
 // Schema for the /matches endpoint
 export const AllMatchSchema = z
   .object({

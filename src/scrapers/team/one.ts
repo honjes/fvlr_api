@@ -32,6 +32,7 @@ const fetchOneTeam = async (id: string): Promise<Object> => {
         Team.country = $('.team-header-country').text().trim()
         Team.link = `https://vlr.gg/team/${id}`
         Team.socials = new Array()
+        // TODO: Does not work
         Team.earnings = $('.team-earnings-value').text().trim()
 
         // Fix Logo
