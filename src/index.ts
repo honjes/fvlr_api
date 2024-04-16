@@ -106,7 +106,7 @@ app.use('*', async (c, next) => {
     // Cache the response
     const cacheLifespan = () => {
       switch (c.req.path.split('/')[1]) {
-        case 'matches':
+        case 'match':
           return 60 * 60 * 2 // 2 Hours
         default:
           return 60
