@@ -28,6 +28,8 @@ import {
   Event,
   eventMatchesSchema,
   EventMatches,
+  scoreSchema,
+  Score,
 } from '../schemas/schemas'
 
 // Types
@@ -303,32 +305,33 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-const ScoreRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/score/{id}',
-    tags: ['Root Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Generates the score for a given match',
-        content: {
-          'application/json': {
-            schema: shortEventSchema,
+// add All Score Routes
+function addScoreRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  // GET /score/{id}
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/score/{id}',
+      tags: ['Root Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Generates the score for a given match',
+          content: {
+            'application/json': {
+              schema: scoreSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Score = await generateScore(c.req.param('id'))
-    return c.json<Object>({
-      status: 'success',
-      data: Score,
-    })
-  },
+    }),
+    async (c: Context) => {
+      const Score = await generateScore(c.req.param('id'))
+      return c.json<Score>(Score)
+    }
+  )
 }
 
 // Working!
@@ -371,6 +374,7 @@ export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   addMatchRoutes(app)
   addPlayerRoutes(app)
   addTeamRoutes(app)
+  addScoreRoutes(app)
 }
 
 /*export const Routes = [
