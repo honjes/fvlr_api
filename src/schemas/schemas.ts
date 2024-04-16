@@ -321,6 +321,15 @@ export const MatchSchema = z.object({
   players: playerMatchStatsArraySchema,
 })
 
+// Schema for the /matches endpoint
+export const AllMatchSchema = z
+  .object({
+    date: z.string(),
+    today: z.boolean(),
+    matches: z.array(MatchSchema),
+  })
+  .array()
+
 // Schema for the /events endpoint
 export const shortEventSchema = z
   .object({
@@ -492,14 +501,5 @@ export const teamSchema = z.object({
   ),
 })
 export type Team = z.infer<typeof teamSchema>
-
-// Schema for the /matches endpoint
-export const AllMatchSchema = z
-  .object({
-    date: z.string(),
-    today: z.boolean(),
-    matches: z.array(MatchSchema),
-  })
-  .array()
 
 export { IDSchema }
