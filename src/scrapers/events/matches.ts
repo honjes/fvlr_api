@@ -38,12 +38,14 @@ const fetchEventMatches = async (id: string): Promise<EventMatches> => {
           }
         })
 
-        // Optimize this to go through the cache at a later point
-        const MatchFetchPromises = new Array()
-        for (let i = 0; i < MatchIDs.length; i++) {
-          MatchFetchPromises.push(generateScore(MatchIDs[i]))
-        }
-        Event.matches = await Promise.all(MatchFetchPromises)
+        // request all match data from the API
+        let matches = await Promise.all(
+          matchIDs.map((matchId) => {
+            return fetch(`http://localhost:${PORT}/match/${matchId}`)
+          })
+        )
+        matches = await Promise.all(matches.map((res) => res.json()))
+        Event.matches = matches.map((match: any) => match.data)
 
         resolve(Event)
       })
