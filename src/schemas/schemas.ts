@@ -516,4 +516,11 @@ export const scoreSchema = z.object({
 })
 export type Score = z.infer<typeof scoreSchema>
 
+// Schema for error endpoint
+export const errorSchema = z.object({
+  status: z.string().openapi({ example: 'error' }),
+  message: z.string().openapi({ example: 'Error: 404' }),
+})
+export type ErrorSchema = z.infer<typeof errorSchema>
+
 export { IDSchema }

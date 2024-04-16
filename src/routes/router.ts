@@ -30,6 +30,8 @@ import {
   EventMatches,
   scoreSchema,
   Score,
+  ErrorSchema,
+  errorSchema,
 } from '../schemas/schemas'
 
 // Types
@@ -334,39 +336,39 @@ function addScoreRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-// Working!
-//- Add event specific routes
-const ErrorRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/error/{type}?',
-    tags: ['Event Routes'],
-    request: {
-      params: z.object({
-        type: z.string().optional(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Displays a generic error for each type',
-        content: {
-          'application/json': {
-            schema: z.object({
-              status: z.string().openapi({ example: 'error' }),
-              message: z.string().openapi({ example: 'Error: 404' }),
-            }),
+// add Error Route
+function addErrorRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  //- Add event specific routes
+  // GET /error/{type}
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/error/{type}?',
+      tags: ['Event Routes'],
+      request: {
+        params: z.object({
+          type: z.string().optional(),
+        }),
+      },
+      responses: {
+        200: {
+          description: 'Displays a generic error for each type',
+          content: {
+            'application/json': {
+              schema: errorSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const type = c.req.param('type')
-    return c.json<Object>({
-      status: 'error',
-      message: 'Error: 404',
-    })
-  },
+    }),
+    async (c: Context) => {
+      const type = c.req.param('type')
+      return c.json<ErrorSchema>({
+        status: 'error',
+        message: 'Error: 404',
+      })
+    }
+  )
 }
 
 export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
@@ -375,6 +377,7 @@ export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   addPlayerRoutes(app)
   addTeamRoutes(app)
   addScoreRoutes(app)
+  addErrorRoutes(app)
 }
 
 /*export const Routes = [
