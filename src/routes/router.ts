@@ -9,7 +9,7 @@ import { fetchAllEvents } from '../scrapers/events/all'
 import { fetchOneEvent } from '../scrapers/events/one'
 import { AllMatches, fetchAllMatches } from '../scrapers/matches/all'
 import { Match, fetchOneMatch } from '../scrapers/matches/one'
-import { fetchOnePlayer } from '../scrapers/player/one'
+import { fetchPlayer } from '../scrapers/player/one'
 import { fetchOneTeam } from '../scrapers/team/one'
 import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
@@ -20,6 +20,8 @@ import {
   EventSchema,
   IDSchema,
   MatchSchema,
+  Player,
+  playerSchema,
 } from '../schemas/schemas'
 
 // Types
@@ -111,33 +113,35 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   )
 }
 
-// Works Perfectly!
-//- Needs Schema Work
-const PlayerRoute = {
-  route: createRoute({
-    method: 'get',
-    path: '/player/{id}',
-    tags: ['Root Routes'],
-    request: {
-      params: IDSchema,
-    },
-    responses: {
-      200: {
-        description: 'Fetches a Player based on their ID from vlr.gg',
-        content: {
-          'application/json': {
-            schema: EventSchema,
+// add All Player Routes
+function addPlayerRoutes(app: OpenAPIHono<Env, {}, '/'>) {
+  // GET /player/{id}
+  // Works Perfectly!
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/player/{id}',
+      tags: ['Root Routes'],
+      request: {
+        params: IDSchema,
+      },
+      description: 'Fetches a Player based on their ID from vlr.gg',
+      responses: {
+        200: {
+          description: 'Fetches a Player based on their ID from vlr.gg',
+          content: {
+            'application/json': {
+              schema: playerSchema,
+            },
           },
         },
       },
-    },
-  }),
-  handler: async (c: Context) => {
-    const Player = await fetchOnePlayer(c.req.param('id')).catch((err) => {
-      throw Error(err)
-    })
-    return c.json<Object>(Player)
-  },
+    }),
+    async (c: Context) => {
+      const Player = await fetchPlayer(c.req.param('id'))
+      return c.json<Player>(Player)
+    }
+  )
 }
 
 // Works Perfectly!
@@ -352,6 +356,7 @@ const ErrorRoute = {
 export default function addRoutes(app: OpenAPIHono<Env, {}, '/'>) {
   addEventsRoute(app)
   addMatchRoutes(app)
+  addPlayerRoutes(app)
 }
 
 /*export const Routes = [
