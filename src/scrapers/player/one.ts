@@ -20,6 +20,10 @@ const fetchOnePlayer = async (id: string) => {
 }
 
 export const fetchPlayer = async (id: string): Promise<Player> => {
+  // check if id is intern
+  if (id[0] === '0') {
+    id = id.replace(/^[0]+/gm, '')
+  }
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/player/${id}`)
