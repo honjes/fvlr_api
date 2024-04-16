@@ -12,6 +12,7 @@ export const regionsEnum = z.enum([
 ])
 export const typeEnum = z.enum(['Event', 'Match'])
 export const statusEnum = z.enum(['Upcoming', 'Ongoing', 'Completed'])
+export const timeEnum = z.enum(['t30', 't60', 't90', 'tall'])
 
 // Util Objects
 // TODO: add openapi examples
@@ -179,6 +180,38 @@ const extStatsObject = z
   })
 export type ExtStats = z.infer<typeof extStatsObject>
 
+// Object for agentstats
+// TODO: change string to number when possible
+const agentStatsObject = z.object({
+  Agent: z.string(),
+  Use: z.string(),
+  RND: z.string(),
+  Rating: z.string(),
+  ACS: z.string(),
+  'K:D': z.string(),
+  ADR: z.string(),
+  KAST: z.string(),
+  KPR: z.string(),
+  APR: z.string(),
+  FKPR: z.string(),
+  FDPR: z.string(),
+  K: z.string(),
+  D: z.string(),
+  A: z.string(),
+  FK: z.string(),
+  FD: z.string(),
+})
+export type AgentStats = z.infer<typeof agentStatsObject>
+
+// Object for the player stats of top agents
+export const playerAgentStatsObject = z.object({
+  labels: z.array(z.string()),
+  time: timeEnum,
+  times: z.array(z.string()),
+  data: z.array(agentStatsObject),
+})
+export type PlayerAgentStats = z.infer<typeof playerAgentStatsObject>
+
 // Object for the team used in matches
 const teamObject = z.object({
   name: z.string().openapi({
@@ -252,7 +285,8 @@ const IDSchema = z.object({
   id: IDType,
 })
 
-const EventSchema = z
+// Schema for the /events endpoint
+export const EventSchema = z
   .object({
     type: typeEnum.openapi({
       example: 'Event',
@@ -286,16 +320,51 @@ const EventSchema = z
   })
   .array()
 
-const playerSchema = z.object({
+// Schema for the /players/{id} endpoint
+export const playerSchema = z.object({
+  ign: z.string(),
   name: z.string(),
-  team: z.string(),
+  realName: z.string(),
+  id: IDType,
   link: z.string(),
-  stats: statsObject,
-  statsAdvanced: extStatsObject,
+  photo: z.string(),
+  country: z.string(),
+  team: IDType.optional(),
+  role: z.string(),
+  earnings: z.string(),
+  stats: playerAgentStatsObject,
+  agentStats: z.object({
+    // TODO: find a way to automate this with the agentArray
+    astra: agentStatsObject,
+    breach: agentStatsObject,
+    brimstone: agentStatsObject,
+    chamber: agentStatsObject,
+    clove: agentStatsObject,
+    cypher: agentStatsObject,
+    deadlock: agentStatsObject,
+    fade: agentStatsObject,
+    gekko: agentStatsObject,
+    harbor: agentStatsObject,
+    iso: agentStatsObject,
+    jett: agentStatsObject,
+    kayo: agentStatsObject,
+    killjoy: agentStatsObject,
+    neon: agentStatsObject,
+    omen: agentStatsObject,
+    phoenix: agentStatsObject,
+    raze: agentStatsObject,
+    reyna: agentStatsObject,
+    sage: agentStatsObject,
+    skye: agentStatsObject,
+    sova: agentStatsObject,
+    viper: agentStatsObject,
+    yoru: agentStatsObject,
+  }),
 })
 export type Player = z.infer<typeof playerSchema>
+
 // Schema for the /matches/{id} endpoint
-const MatchSchema = z.object({
+export const MatchSchema = z.object({
   type: typeEnum.openapi({
     example: 'Event',
   }),
@@ -338,4 +407,4 @@ export const AllMatchSchema = z
   })
   .array()
 
-export { IDSchema, EventSchema, MatchSchema }
+export { IDSchema }
