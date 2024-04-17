@@ -49,6 +49,7 @@ app.use('*', async (c, next) => {
   }
   console.log(c.req.path)
 
+  const cachedPath = c.req.path.replaceAll(/\/0+/gm, '/') // Remove any trailing zeros from the path
   // Cached Response
   if (await client.exists(c.req.path)) {
     console.log('Cached Response')
@@ -60,7 +61,7 @@ app.use('*', async (c, next) => {
       cachedResponse = JSON.parse(cachedData)
     } catch {
       // Clear Cache and close the request
-      client.del(c.req.path)
+      client.del(cachedPath)
       await next()
       return
     }
@@ -112,7 +113,7 @@ app.use('*', async (c, next) => {
         default:
       }
     }
-    client.setEx(c.req.path, cacheLifespan(), JSON.stringify(data))
+    client.setEx(cachedPath, cacheLifespan(), JSON.stringify(data))
     // Check if it was an Error
     if (data.status === 'error') {
       c.res = c.json(
