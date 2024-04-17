@@ -381,6 +381,9 @@ export const eventSchema = z.object({
   logo: z.string().openapi({
     example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
+  status: statusEnum.openapi({
+    example: statusEnum.enum.Completed,
+  }),
   teams_item: z.array(
     z.object({
       name: z.string(),

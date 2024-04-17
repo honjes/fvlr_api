@@ -4,7 +4,7 @@
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
-import { Event, typeEnum } from '../../schemas/schemas'
+import { Event, statusEnum, typeEnum } from '../../schemas/schemas'
 
 const fetchOneEvent = async (id: string): Promise<Event> => {
   return new Promise(async (resolve, reject) => {
@@ -27,6 +27,16 @@ const fetchOneEvent = async (id: string): Promise<Event> => {
         Event.id = id
         Event.logo =
           'https:' + $('.wf-avatar.event-header-thumb img').attr('src')
+        // get status of the event
+        // TODO: implement check for ongoing events
+        Event.status =
+          $(
+            '.event-content > div.wf-card table tbody tr:first-of-type td:nth-of-type(3)'
+          )
+            .text()
+            .trim() == 'TBD'
+            ? statusEnum.Enum.Upcoming
+            : statusEnum.Enum.Completed
         // Get all teams
         const Teams = new Array()
         $('.event-team').each((i, element) => {
