@@ -4,8 +4,11 @@ services:
     image: redis
     ports:
       - 6379:6379
+    command: redis-server --save 60 1 --loglevel warning
     networks:
       - vlr_network
+    volumes:
+      - redis_data:/data
 
   fvlr_api:
     image: fvlr_api:latest
@@ -21,3 +24,7 @@ services:
 
 networks:
   vlr_network:
+
+volumes:
+  redis_data:
+    external: false
