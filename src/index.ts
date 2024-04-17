@@ -6,6 +6,7 @@ import addRoutes from './routes/router'
 import { createClient } from 'redis'
 import 'dotenv/config'
 import { Match } from './scrapers/matches/one'
+import { statusEnum, typeEnum } from './schemas/schemas'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 export const PORT = process.env.PORT || 9091
 // Initial Setup
@@ -104,16 +105,24 @@ app.use('*', async (c, next) => {
       return
     }
     // Intercept the JSON
-    const data = await c.res.json()
+    let data = await c.res.json()
     // Cache the response
-    const cacheLifespan = () => {
-      switch (c.req.path.split('/')[1]) {
-        case 'match':
-          return 60 * 60 * 2 // 2 Hours
-        default:
-      }
+    let cacheLifespan = 60 // 1 Minute
+    switch (c.req.path.split('/')[1]) {
+      case 'match':
+        data = data as Match
+        // Check if the match is completed
+        if (data.status === statusEnum.Enum.Completed)
+          cacheLifespan = 60 * 60 * 24 * 365 // 1 Year
+        break
+      case 'event':
+        if (data.status) {
+          if (data.status === statusEnum.Enum.Completed)
+            cacheLifespan = 60 * 60 * 24 * 365 // 1 Year
+        }
+        break
     }
-    client.setEx(cachedPath, cacheLifespan(), JSON.stringify(data))
+    client.setEx(cachedPath, cacheLifespan, JSON.stringify(data))
     // Check if it was an Error
     if (data.status === 'error') {
       c.res = c.json(
