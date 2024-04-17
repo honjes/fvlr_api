@@ -107,7 +107,7 @@ app.use('*', async (c, next) => {
     // Intercept the JSON
     let data = await c.res.json()
     // Cache the response
-    let cacheLifespan = 60 // 1 Minute
+    let cacheLifespan = 60 * 60 * 1 // 1 Hour
     switch (c.req.path.split('/')[1]) {
       case 'match':
         data = data as Match
