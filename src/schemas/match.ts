@@ -99,6 +99,7 @@ export const MatchSchema = z.object({
   teams: z.array(gameTeamObject).or(z.array(teamSchema)),
   players: playerMatchStatsArraySchema.or(z.undefined()),
 })
+export type Match = z.infer<typeof MatchSchema>
 
 // Schema for the /matches endpoint
 export const AllMatchSchema = z

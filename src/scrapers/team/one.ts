@@ -4,7 +4,7 @@
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
 import { PORT } from '../..'
-import { Player, Team } from '../../schemas/schemas'
+import { Team } from '../../schemas/teams'
 
 const fetchOneTeam = async (id: string): Promise<Team> => {
   return new Promise(async (resolve, reject) => {

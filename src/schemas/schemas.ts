@@ -23,11 +23,3 @@ export const errorSchema = z.object({
   message: z.string().openapi({ example: 'Error: 404' }),
 })
 export type ErrorSchema = z.infer<typeof errorSchema>
-
-export * from './events'
-export * from './match'
-export * from './player'
-export * from './score'
-export * from './stats'
-export * from './teams'
-export * from './enums'

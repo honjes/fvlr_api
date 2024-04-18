@@ -4,8 +4,10 @@
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
-import { EventMatches, typeEnum } from '../../schemas/schemas'
 import { PORT } from '../..'
+import { typeEnum } from '../../schemas/enums'
+import { EventMatches } from '../../schemas/events'
+
 
 const fetchEventMatches = async (
   id: string,

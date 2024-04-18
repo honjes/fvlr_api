@@ -3,8 +3,9 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
+import { typeEnum, statusEnum } from '../../schemas/enums'
+import { Event } from '../../schemas/events'
 // Schema
-import { Event, statusEnum, typeEnum } from '../../schemas/schemas'
 
 const fetchOneEvent = async (id: string): Promise<Event> => {
   return new Promise(async (resolve, reject) => {

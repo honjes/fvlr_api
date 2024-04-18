@@ -5,18 +5,17 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
+import { typeEnum, statusEnum } from '../../schemas/enums'
 import {
-  ExtStats,
-  Game,
   MatchSchema,
-  PlayerMatchStatsElement,
-  PlayerStats,
-  GameTeamExtended,
-  statusEnum,
-  typeEnum,
-  Team,
   GameTeam,
-} from '../../schemas/schemas'
+  Game,
+  GameTeamExtended,
+  PlayerMatchStatsElement,
+} from '../../schemas/match'
+import { PlayerStats } from '../../schemas/player'
+import { ExtStats } from '../../schemas/stats'
+import { Team } from '../../schemas/teams'
 // Types
 export type Match = z.infer<typeof MatchSchema>
 export interface FetchOneMatchOptions {

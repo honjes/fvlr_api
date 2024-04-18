@@ -14,28 +14,20 @@ import { fetchOneTeam } from '../scrapers/team/one'
 import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
 
-// Schemas
+// Schemas / Types
+import { IDSchema, ErrorSchema, errorSchema } from '../schemas/schemas'
+import { Event } from '../schemas/events'
+import { ShortEvent } from '../scrapers/events/all'
 import {
-  AllMatchSchema,
   shortEventSchema,
-  IDSchema,
-  MatchSchema,
-  Player,
-  Team,
-  playerSchema,
-  teamSchema,
   eventSchema,
-  Event,
   eventMatchesSchema,
   EventMatches,
-  scoreSchema,
-  Score,
-  ErrorSchema,
-  errorSchema,
-} from '../schemas/schemas'
-
-// Types
-import { ShortEvent } from '../scrapers/events/all'
+} from '../schemas/events'
+import { AllMatchSchema, MatchSchema } from '../schemas/match'
+import { playerSchema, Player } from '../schemas/player'
+import { scoreSchema, Score } from '../schemas/score'
+import { teamSchema, Team } from '../schemas/teams'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {

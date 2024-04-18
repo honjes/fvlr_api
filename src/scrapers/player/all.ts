@@ -5,6 +5,6 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { PlayerSchema } from '../../schemas/schemas'
+import { playerSchema } from '../../schemas/player'
 // Type
-type Player = z.infer<typeof PlayerSchema>
+type Player = z.infer<typeof playerSchema>

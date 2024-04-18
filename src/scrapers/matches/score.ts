@@ -1,7 +1,12 @@
 // Schema
 import { z } from '@hono/zod-openapi'
-import { MatchSchema, Score } from '../../schemas/schemas'
 import { PORT } from '../..'
+import {
+  MatchSchema,
+  PlayerMatchStats,
+  PlayerMatchStatsElement,
+} from '../../schemas/match'
+import { Score } from '../../schemas/score'
 // Types
 type Match = z.infer<typeof MatchSchema>
 
@@ -12,7 +17,8 @@ const generateScore = async (id: string): Promise<Score> => {
   const scores_object: Score['scores_object'] = {}
   const scores_array: Score['scores_array'] = []
   // Itterate through the players, generate score based on formula
-  match.players.forEach((player) => {
+  const players = match.players as PlayerMatchStats
+  players.forEach((player: PlayerMatchStatsElement) => {
     let score = 0
     score += Number(player.stats.acs)
     score += Number(player.stats.k) * 4
