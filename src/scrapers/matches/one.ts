@@ -92,15 +92,22 @@ const fetchOneMatch = async (
         Match.players = new Array()
 
         // Scores
-        const MapScore = new Array()
+        const MapScore: number[] = []
         MapScore.push(
-          $('.match-header-vs .match-header-vs-score span')
-            .first()
-            .text()
-            .trim()
+          Number(
+            $('.match-header-vs .match-header-vs-score span')
+              .first()
+              .text()
+              .trim()
+          )
         )
         MapScore.push(
-          $('.match-header-vs .match-header-vs-score span').last().text().trim()
+          Number(
+            $('.match-header-vs .match-header-vs-score span')
+              .last()
+              .text()
+              .trim()
+          )
         )
         // Set Match Teams
         // Request the teams
@@ -170,10 +177,9 @@ const fetchOneMatch = async (
             ct: Number($(team0Score).find('.mod-ct').text().trim()),
             ot: Number($(team0Score).find('.mod-ot').text().trim()),
           }
-          Match.games[i].teams[0].score = $(team0Score)
-            .find('.score')
-            .text()
-            .trim()
+          Match.games[i].teams[0].score = Number(
+            $(team0Score).find('.score').text().trim()
+          )
           const team1Score = $(element).find(`div.team:last-of-type`)
 
           Match.games[i].teams[1].scoreAdvanced = {
@@ -181,10 +187,9 @@ const fetchOneMatch = async (
             ct: Number($(team1Score).find('.mod-ct').text().trim()),
             ot: Number($(team1Score).find('.mod-ot').text().trim()),
           }
-          Match.games[i].teams[1].score = $(team1Score)
-            .find('.score')
-            .text()
-            .trim()
+          Match.games[i].teams[1].score = Number(
+            $(team1Score).find('.score').text().trim()
+          )
           Match.games[i].teams[0].players = new Array()
           Match.games[i].teams[1].players = new Array()
 

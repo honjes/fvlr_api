@@ -17,8 +17,8 @@ const gameTeamObject = z.object({
     .openapi({
       example: '000000000001927',
     }),
-  score: z.string().openapi({
-    example: '13',
+  score: z.number().openapi({
+    example: 13,
   }),
 })
 export type GameTeam = z.infer<typeof gameTeamObject>
@@ -98,7 +98,7 @@ export const MatchSchema = z.object({
   games: z.array(gameObject),
   teams: z
     .array(gameTeamObject)
-    .or(z.array(teamSchema.extend({ score: z.string() }))),
+    .or(z.array(teamSchema.extend({ score: z.number() }))),
   players: playerMatchStatsArraySchema.or(z.boolean()),
 })
 export type Match = z.infer<typeof MatchSchema>
