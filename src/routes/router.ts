@@ -158,6 +158,9 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Event Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.boolean().optional(),
+        }),
       },
       responses: {
         200: {
@@ -172,11 +175,13 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     },
     async (c: Context) => {
       const id = c.req.param('id')
+      const ext = Boolean(c.req.query('ext')) || false
+
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
 
-      const Event = await fetchEventMatches(id)
+      const Event = await fetchEventMatches(id, ext)
       return c.json<EventMatches>(Event)
     }
   )
@@ -219,6 +224,9 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Root Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.boolean().optional(),
+        }),
       },
       description: 'Fetches a Match based on the Match ID from vlr.gg',
       responses: {
@@ -233,10 +241,11 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
+      const ext = Boolean(c.req.query('ext')) || false
       // validate Match ID
       // make sure id is a string of numbers
       if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
-      const Match = await fetchOneMatch(c.req.param('id'))
+      const Match = await fetchOneMatch(c.req.param('id'), ext)
       return c.json<Match>(Match)
     }
   )

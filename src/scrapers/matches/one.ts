@@ -14,16 +14,18 @@ import {
   GameTeamExtended,
   statusEnum,
   typeEnum,
+  Team,
+  GameTeam,
 } from '../../schemas/schemas'
 // Types
 export type Match = z.infer<typeof MatchSchema>
 
-const fetchOneMatch = async (id: string): Promise<Match> => {
+const fetchOneMatch = async (id: string, ext: boolean): Promise<Match> => {
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/${id}`)
       .then((response) => response.text())
-      .then((data) => {
+      .then(async (data) => {
         // parse the page
         let $ = load(data)
         const Match: Match = new Object() as Match
@@ -89,16 +91,44 @@ const fetchOneMatch = async (id: string): Promise<Match> => {
           $('.match-header-vs .match-header-vs-score span').last().text().trim()
         )
         // Set Match Teams
-        const TeamContainers = $('.match-header-vs .wf-title-med')
-        TeamContainers.each((i, element) => {
-          Match.teams.push({
-            name: $(element).text().trim(),
-            id: idGenerator(
-              $(element).parent().parent().attr('href')?.split('/')[2] || ''
-            ),
-            score: MapScore[i],
+        // Request the teams
+        if (ext) {
+          const teamIds: string[] = []
+          const TeamContainers = $('.match-header-vs .wf-title-med')
+          TeamContainers.each((i, element) => {
+            teamIds.push(
+              idGenerator(
+                $(element).parent().parent().attr('href')?.split('/')[2] || ''
+              )
+            )
           })
-        })
+
+          // Get Teams
+          const teamResponse = await Promise.all(
+            teamIds.map((id) =>
+              fetch(`http://localhost:${process.env.PORT}/team/${id}`)
+            )
+          )
+          const teamData = await Promise.all(
+            teamResponse.map((res) => res.json())
+          )
+          Match.teams = teamData.map((team: any) => team.data as Team)
+        }
+        // get short version of Teams
+        else {
+          const TeamContainers = $('.match-header-vs .wf-title-med')
+          const teamArray: GameTeam[] = []
+          TeamContainers.each((i, element) => {
+            teamArray.push({
+              name: $(element).text().trim(),
+              id: idGenerator(
+                $(element).parent().parent().attr('href')?.split('/')[2] || ''
+              ),
+              score: MapScore[i],
+            })
+          })
+          Match.teams = teamArray
+        }
 
         // Getting Match Stats
         const StatsContainer = $(

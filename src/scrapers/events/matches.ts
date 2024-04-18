@@ -7,7 +7,10 @@ import { idGenerator } from '../util'
 import { EventMatches, typeEnum } from '../../schemas/schemas'
 import { PORT } from '../..'
 
-const fetchEventMatches = async (id: string): Promise<EventMatches> => {
+const fetchEventMatches = async (
+  id: string,
+  extended: boolean
+): Promise<EventMatches> => {
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/event/matches/${id}`)
