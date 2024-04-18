@@ -151,7 +151,7 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       request: {
         params: IDSchema,
         query: z.object({
-          ext: z.boolean().optional(),
+          ext: z.string().default('false'),
         }),
       },
       responses: {
@@ -167,13 +167,13 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     },
     async (c: Context) => {
       const id = c.req.param('id')
-      const ext = Boolean(c.req.query('ext')) || false
+      const ext = Boolean(c.req.query('ext'))
 
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
 
-      const Event = await fetchEventMatches(id, ext)
+      const Event = await fetchEventMatches(id, { ext })
       return c.json<EventMatches>(Event)
     }
   )
@@ -217,8 +217,8 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       request: {
         params: IDSchema,
         query: z.object({
-          ext: z.boolean().default(false),
-          includePlayers: z.boolean().default(true),
+          ext: z.string().default('false'),
+          includePlayers: z.string().default('true'),
         }),
       },
       description: 'Fetches a Match based on the Match ID from vlr.gg',
