@@ -120,10 +120,14 @@ app.use('*', async (c, next) => {
           cacheLifespan = 60 * 60 * 24 * 365 // 1 Year
         break
       case 'event':
+        if (c.req.path.split('/')[3] === 'teams') cacheLifespan = 60 * 60 * 24 // 1 Day
         if (data.status) {
           if (data.status === statusEnum.Enum.Completed)
             cacheLifespan = 60 * 60 * 24 * 365 // 1 Year
         }
+        break
+      case 'player':
+        cacheLifespan = 60 * 60 * 24 // 1 Day
         break
     }
     client.setEx(cachedPath, cacheLifespan, JSON.stringify(data))
