@@ -43,9 +43,10 @@ const fetchOneMatch = async (
         const Match: Match = new Object() as Match
         Match.type = typeEnum.Enum.Match
         Match.id = id
-        Match.date = $('.match-header-date .moment-tz-convert:nth-child(1)')
-          .text()
-          .trim()
+        Match.date =
+          $('.match-header-date .moment-tz-convert:nth-child(1)').attr(
+            'data-utc-ts'
+          ) || ''
         Match.time = $('.match-header-date .moment-tz-convert:nth-child(2)')
           .text()
           .trim()
