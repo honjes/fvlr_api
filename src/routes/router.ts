@@ -225,7 +225,8 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       request: {
         params: IDSchema,
         query: z.object({
-          ext: z.boolean().optional(),
+          ext: z.boolean().default(false),
+          includePlayers: z.boolean().default(true),
         }),
       },
       description: 'Fetches a Match based on the Match ID from vlr.gg',
@@ -241,11 +242,15 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
-      const ext = Boolean(c.req.query('ext')) || false
+      const ext = Boolean(c.req.query('ext'))
+      const includePlayers = Boolean(c.req.query('includePlayers'))
       // validate Match ID
       // make sure id is a string of numbers
       if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
-      const Match = await fetchOneMatch(c.req.param('id'), ext)
+      const Match = await fetchOneMatch(c.req.param('id'), {
+        ext,
+        includePlayers,
+      })
       return c.json<Match>(Match)
     }
   )

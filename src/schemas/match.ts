@@ -97,7 +97,7 @@ export const MatchSchema = z.object({
   }),
   games: z.array(gameObject),
   teams: z.array(gameTeamObject).or(z.array(teamSchema)),
-  players: playerMatchStatsArraySchema,
+  players: playerMatchStatsArraySchema.or(z.undefined()),
 })
 
 // Schema for the /matches endpoint
