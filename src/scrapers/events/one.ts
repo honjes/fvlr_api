@@ -47,6 +47,11 @@ const fetchOneEvent = async (id: string): Promise<Event> => {
             team.logo =
               $(element).find('.event-team-players-mask > img').attr('src') ||
               ''
+            // when no logo is found, use the full vlr logo url
+            team.logo = team.logo.replace(
+              '/img/vlr/tmp/vlr.png',
+              'https://www.vlr.gg/img/vlr/tmp/vlr.png'
+            )
             team.link = $(element).find('.event-team-name').attr('href') || ''
             team.id = idGenerator(team.link.split('/')[2])
             team.players = new Array()
