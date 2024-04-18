@@ -97,7 +97,7 @@ export const MatchSchema = z.object({
   }),
   games: z.array(gameObject),
   teams: z.array(gameTeamObject).or(z.array(teamSchema)),
-  players: playerMatchStatsArraySchema.or(z.undefined()),
+  players: playerMatchStatsArraySchema.or(z.boolean()),
 })
 export type Match = z.infer<typeof MatchSchema>
 

@@ -65,7 +65,9 @@ export const eventSchema = z.object({
       id: IDType,
       players: z.array(
         z.object({
-          type: typeEnum,
+          type: typeEnum.openapi({
+            example: 'Player',
+          }),
           ign: z.string(),
           link: z.string(),
           id: IDType,
@@ -76,13 +78,17 @@ export const eventSchema = z.object({
   ),
   players_item: z.array(
     z.object({
-      type: typeEnum,
+      type: typeEnum.openapi({
+        example: 'Event',
+      }),
       ign: z.string(),
       name: z.string(),
       link: z.string(),
       id: IDType,
       team: z.object({
-        type: typeEnum,
+        type: typeEnum.openapi({
+          example: 'Team',
+        }),
         name: z.string(),
         id: IDType,
       }),

@@ -269,6 +269,8 @@ const fetchOneMatch = async (
             } else {
               // Add Logic for 2nd event to merge into first one
             }
+          } else {
+            Match.players = false
           }
         })
 
