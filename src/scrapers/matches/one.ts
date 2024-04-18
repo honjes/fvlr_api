@@ -124,7 +124,9 @@ const fetchOneMatch = async (
           const teamData = await Promise.all(
             teamResponse.map((res) => res.json())
           )
-          Match.teams = teamData.map((team: any) => team.data as Team)
+          Match.teams = teamData.map((team: any, index) => {
+            return { ...team.data, score: MapScore[index] }
+          })
         }
         // get short version of Teams
         else {

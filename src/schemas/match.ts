@@ -96,7 +96,9 @@ export const MatchSchema = z.object({
     example: statusEnum.enum.Completed,
   }),
   games: z.array(gameObject),
-  teams: z.array(gameTeamObject).or(z.array(teamSchema)),
+  teams: z
+    .array(gameTeamObject)
+    .or(z.array(teamSchema.extend({ score: z.string() }))),
   players: playerMatchStatsArraySchema.or(z.boolean()),
 })
 export type Match = z.infer<typeof MatchSchema>
