@@ -6,7 +6,20 @@ import { idGenerator } from '../util'
 import { PORT } from '../..'
 import { Team } from '../../schemas/teams'
 
-const fetchOneTeam = async (id: string): Promise<Team> => {
+export interface FetchOneTeamOptions {
+  ext?: boolean
+  includePlayers?: boolean
+}
+
+const fetchOneTeam = async (
+  id: string,
+  options?: FetchOneTeamOptions
+): Promise<Team> => {
+  const optionsDefault: FetchOneTeamOptions = {
+    ext: false,
+    includePlayers: true,
+  }
+  const { ext, includePlayers } = { ...optionsDefault, ...options }
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/team/${id}`)
@@ -97,17 +110,19 @@ const fetchOneTeam = async (id: string): Promise<Team> => {
         })
 
         // SICK way of keeping players cached ;)
-        const playerPromises = [
-          ...players_item.map((player) => {
-            return fetch(`http://localhost:${PORT}/player/${player.id}`)
-          }),
-          ...Team.staff_item.map((player) => {
-            return fetch(`http://localhost:${PORT}/player/${player.id}`)
-          }),
-        ]
-        let players = await Promise.all(playerPromises)
-        players = await Promise.all(players.map((res) => res.json()))
-        Team.players = players.map((player: any) => player.data)
+        if (includePlayers) {
+          const playerPromises = [
+            ...players_item.map((player) => {
+              return fetch(`http://localhost:${PORT}/player/${player.id}`)
+            }),
+            ...Team.staff_item.map((player) => {
+              return fetch(`http://localhost:${PORT}/player/${player.id}`)
+            }),
+          ]
+          let players = await Promise.all(playerPromises)
+          players = await Promise.all(players.map((res) => res.json()))
+          Team.players = players.map((player: any) => player.data)
+        }
 
         // Generate team.staff array of ids
         Team.staff = new Array()

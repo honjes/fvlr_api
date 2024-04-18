@@ -288,6 +288,10 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Root Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.string().default('false'),
+          includePlayers: z.string().default('true'),
+        }),
       },
       description: 'Fetches a Team based on their ID from vlr.gg',
       responses: {
@@ -303,11 +307,13 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
     }),
     async (c: Context) => {
       const id = c.req.param('id')
+      const ext = Boolean(c.req.query('ext'))
+      const includePlayers = Boolean(c.req.query('includePlayers'))
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')
 
-      const Team = await fetchOneTeam(id)
+      const Team = await fetchOneTeam(id, { ext, includePlayers })
       return c.json<Team>(Team)
     }
   )
