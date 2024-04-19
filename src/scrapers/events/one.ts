@@ -5,6 +5,7 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 import { typeEnum, statusEnum } from '../../schemas/enums'
 import { Event } from '../../schemas/events'
+import { logStats } from '../..'
 // Schema
 
 const fetchOneEvent = async (id: string): Promise<Event> => {
@@ -119,6 +120,7 @@ const fetchOneEvent = async (id: string): Promise<Event> => {
         Event.teams_item = Teams
         Event.players_item = Players
         Event.failed_links = FailedLinks
+        logStats.crawledSites++
         resolve(Event)
       })
       .catch((err) => {

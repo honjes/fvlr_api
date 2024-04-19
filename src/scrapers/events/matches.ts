@@ -7,6 +7,7 @@ import { idGenerator, requestSelf } from '../util'
 import { typeEnum } from '../../schemas/enums'
 import { EventMatches } from '../../schemas/events'
 import { Match } from '../../schemas/match'
+import { logStats } from '../..'
 
 export interface FetchEventMatchesOptions {
   ext?: boolean
@@ -58,6 +59,7 @@ const fetchEventMatches = async (
           )
         )
 
+        logStats.crawledSites++
         resolve(Event)
       })
       .catch((err) => {

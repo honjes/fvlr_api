@@ -5,6 +5,7 @@ import { load } from 'cheerio'
 import { idGenerator, requestSelf } from '../util'
 import { Team } from '../../schemas/teams'
 import { Player } from '../../schemas/player'
+import { logStats } from '../..'
 
 export interface FetchOneTeamOptions {
   ext?: boolean
@@ -124,6 +125,7 @@ const fetchOneTeam = async (
           Team.staff.push(idGenerator(player.id))
         })
 
+        logStats.crawledSites++
         resolve(Team)
       })
       .catch((err) => {

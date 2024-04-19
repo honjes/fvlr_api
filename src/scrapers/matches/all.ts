@@ -7,6 +7,7 @@ import { fetchOneMatch } from './one'
 // Schema
 import { z } from '@hono/zod-openapi'
 import { AllMatchSchema } from '../../schemas/match'
+import { logStats } from '../..'
 // Type
 export type AllMatches = z.infer<typeof AllMatchSchema>
 
@@ -57,6 +58,7 @@ const fetchAllMatches = async (): Promise<AllMatches> => {
 
         // Build the Matches Object
         Promise.all(MatchPulls).then(() => {
+          logStats.crawledSites++
           resolve(Matches)
         })
       })

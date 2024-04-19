@@ -5,6 +5,7 @@ import { load } from 'cheerio'
 import { idGenerator, getAgentArray } from '../util'
 import { Player, PlayerAgentStats } from '../../schemas/player'
 import { AgentStats } from '../../schemas/stats'
+import { logStats } from '../..'
 
 const fetchOnePlayer = async (id: string) => {
   // Validate input
@@ -128,6 +129,7 @@ export const fetchPlayer = async (id: string): Promise<Player> => {
           }
         })
 
+        logStats.crawledSites++
         resolve(Player)
       })
       .catch((err) => {

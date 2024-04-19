@@ -7,6 +7,7 @@ import { createClient } from 'redis'
 import 'dotenv/config'
 import { Match } from './scrapers/matches/one'
 import { statusEnum } from './schemas/enums'
+import { logger } from './logger'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 export const PORT = process.env.PORT || 9091
 // Initial Setup
@@ -53,6 +54,8 @@ app.use(
     origin: '*',
   })
 )
+export const logStats = { cached: false, crawledSites: 0 }
+app.use(logger(logStats))
 // Caching
 app.use('*', async (c, next) => {
   // Set a Default Return Value
@@ -78,7 +81,6 @@ app.use('*', async (c, next) => {
     await next()
     return
   }
-  console.log(c.req.path)
 
   const cachedPath = c.req.raw.url
     .replace(c.req.header('host') || '', '')
@@ -87,7 +89,7 @@ app.use('*', async (c, next) => {
     .replaceAll(/\/0+/gm, '/') // Remove any trailing zeros from the path
   // Cached Response
   if (await client.exists(cachedPath)) {
-    console.log('Cached Response')
+    logStats.cached = true
     const cachedData = await client.get(cachedPath) // .001ms
     if (cachedData === null) return // Should never happen
     let cachedResponse
@@ -124,7 +126,7 @@ app.use('*', async (c, next) => {
   }
   // Non-Cached Response
   else {
-    console.log('Not Cached Response')
+    logStats.cached = false
     // Let the page generate as normal
     await next()
     // check if the route was not found
