@@ -168,7 +168,7 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     },
     async (c: Context) => {
       const id = c.req.param('id')
-      const ext = Boolean(c.req.query('ext'))
+      const ext = Boolean(c.req.query('ext') || false)
 
       // Validate input
       // make sure id is a string of numbers
@@ -235,8 +235,8 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
-      const ext = Boolean(c.req.query('ext'))
-      const includePlayers = Boolean(c.req.query('includePlayers'))
+      const ext = Boolean(c.req.query('ext') || false)
+      const includePlayers = Boolean(c.req.query('includePlayers') || true)
       // validate Match ID
       // make sure id is a string of numbers
       if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
@@ -308,8 +308,8 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
     }),
     async (c: Context) => {
       const id = c.req.param('id')
-      const ext = Boolean(c.req.query('ext'))
-      const includePlayers = Boolean(c.req.query('includePlayers'))
+      const ext = Boolean(c.req.query('ext') || false)
+      const includePlayers = Boolean(c.req.query('includePlayers') || true)
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')
