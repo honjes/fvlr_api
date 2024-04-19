@@ -2,7 +2,7 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator, AgentArray } from '../util'
+import { idGenerator, getAgentArray } from '../util'
 import { Player, PlayerAgentStats } from '../../schemas/player'
 import { AgentStats } from '../../schemas/stats'
 
@@ -25,6 +25,9 @@ export const fetchPlayer = async (id: string): Promise<Player> => {
   if (id[0] === '0') {
     id = id.replace(/^[0]+/gm, '')
   }
+  // get agentArray
+  const agentArray = await getAgentArray()
+
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/player/${id}`)
@@ -100,8 +103,8 @@ export const fetchPlayer = async (id: string): Promise<Player> => {
         })
         // Add the agent array for stats
         Player.agentStats = new Object() as Player['agentStats']
-        for (let i = 0; i < AgentArray.length; i++) {
-          const agentName = AgentArray[i] as keyof Player['agentStats']
+        for (let i = 0; i < agentArray.length; i++) {
+          const agentName = agentArray[i] as keyof Player['agentStats']
 
           Player.agentStats[agentName] = new Object() as AgentStats
           // Add the agent stats with no data

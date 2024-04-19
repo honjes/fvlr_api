@@ -11,7 +11,7 @@ const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 export const PORT = process.env.PORT || 9091
 // Initial Setup
 const app = new OpenAPIHono()
-const client = createClient({
+export const client = createClient({
   url: DB_URI,
 })
 // Connect to Redis
