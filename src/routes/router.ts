@@ -30,7 +30,7 @@ import {
   eventMatchesSchema,
   EventMatches,
 } from '../schemas/events'
-import { AllMatchSchema, MatchSchema } from '../schemas/match'
+import { AllMatchSchema, matchSchema } from '../schemas/match'
 import { playerSchema, Player } from '../schemas/player'
 import { scoreSchema, Score } from '../schemas/score'
 import { teamSchema, Team } from '../schemas/teams'
@@ -233,7 +233,7 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
           description: 'Fetches a Match based on the Match ID from vlr.gg',
           content: {
             'application/json': {
-              schema: MatchSchema,
+              schema: matchSchema,
             },
           },
         },

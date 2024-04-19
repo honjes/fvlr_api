@@ -1,7 +1,7 @@
 import { z } from '@hono/zod-openapi'
 import { typeEnum, regionsEnum, statusEnum } from './enums'
 import { IDType } from './schemas'
-import { MatchSchema } from './match'
+import { matchSchema } from './match'
 import { teamSchema } from './teams'
 import { playerSchema } from './player'
 
@@ -116,7 +116,7 @@ export const eventMatchesSchema = z.object({
   img: z.string().openapi({
     example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
-  matches: MatchSchema.array(),
+  matches: matchSchema.array(),
 })
 export type EventMatches = z.infer<typeof eventMatchesSchema>
 

@@ -65,7 +65,7 @@ export type PlayerMatchStatsElement = z.infer<
 >
 
 // Schema for the /matches/{id} endpoint
-export const MatchSchema = z.object({
+export const matchSchema = z.object({
   type: typeEnum.openapi({
     example: 'Event',
   }),
@@ -101,13 +101,13 @@ export const MatchSchema = z.object({
     .or(z.array(teamSchema.extend({ score: z.number() }))),
   players: playerMatchStatsArraySchema.or(z.boolean()),
 })
-export type Match = z.infer<typeof MatchSchema>
+export type Match = z.infer<typeof matchSchema>
 
 // Schema for the /matches endpoint
 export const AllMatchSchema = z
   .object({
     date: z.string(),
     today: z.boolean(),
-    matches: z.array(MatchSchema),
+    matches: z.array(matchSchema),
   })
   .array()

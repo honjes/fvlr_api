@@ -1,14 +1,14 @@
 // Schema
 import { z } from '@hono/zod-openapi'
 import {
-  MatchSchema,
+  matchSchema,
   PlayerMatchStats,
   PlayerMatchStatsElement,
 } from '../../schemas/match'
 import { Score } from '../../schemas/score'
 import { requestSelf } from '../util'
 // Types
-type Match = z.infer<typeof MatchSchema>
+type Match = z.infer<typeof matchSchema>
 
 const generateScore = async (id: string): Promise<Score> => {
   const match = await requestSelf<Match>(`match/${id}`)
