@@ -2,17 +2,17 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
-import { Routes } from './routes/router'
+import addRoutes from './routes/router'
 import { createClient } from 'redis'
 import 'dotenv/config'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
-const PORT = process.env.PORT || 9091
+export const PORT = process.env.PORT || 9091
 // Initial Setup
 const app = new OpenAPIHono()
 const client = createClient({
   url: DB_URI,
 })
-let CacheEnabled = true
+let CacheEnabled = process.env.CACHE_ENABLED || true
 let ConnectionCount = 0
 // CORS
 app.use(
@@ -90,12 +90,23 @@ app.use('*', async (c, next) => {
     console.log('Not Cached Response')
     // Let the page generate as normal
     await next()
+    // check if the route was not found
+    if (c.res.status === 404) {
+      c.res = c.json(
+        {
+          status: 'error',
+          message: 'Route not found',
+        },
+        404
+      )
+      return
+    }
     // Intercept the JSON
     const data = await c.res.json()
     // Cache the response
     const cacheLifespan = () => {
       switch (c.req.path.split('/')[1]) {
-        case 'matches':
+        case 'match':
           return 60 * 60 * 2 // 2 Hours
         default:
           return 60
@@ -127,11 +138,7 @@ app.use('/', async (c, next) => {
 })
 
 // Routes
-Routes.forEach((route) => {
-  app.openapi(route.route, (c) => {
-    return route.handler(c)
-  })
-})
+addRoutes(app)
 
 // Swagger UI
 app.get(
