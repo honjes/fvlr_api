@@ -2,9 +2,9 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator } from '../util'
-import { PORT } from '../..'
+import { idGenerator, requestSelf } from '../util'
 import { Team } from '../../schemas/teams'
+import { Player } from '../../schemas/player'
 
 export interface FetchOneTeamOptions {
   ext?: boolean
@@ -111,17 +111,11 @@ const fetchOneTeam = async (
 
         // SICK way of keeping players cached ;)
         if (includePlayers) {
-          const playerPromises = [
-            ...players_item.map((player) => {
-              return fetch(`http://localhost:${PORT}/player/${player.id}`)
-            }),
-            ...Team.staff_item.map((player) => {
-              return fetch(`http://localhost:${PORT}/player/${player.id}`)
-            }),
-          ]
-          let players = await Promise.all(playerPromises)
-          players = await Promise.all(players.map((res) => res.json()))
-          Team.players = players.map((player: any) => player.data)
+          const playerData = await requestSelf<Player[]>([
+            ...players_item.map((player) => `player/${player.id}`),
+            ...Team.staff_item.map((player) => `player/${player.id}`),
+          ])
+          Team.players = playerData
         }
 
         // Generate team.staff array of ids
