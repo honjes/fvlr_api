@@ -14,6 +14,36 @@ const app = new OpenAPIHono()
 const client = createClient({
   url: DB_URI,
 })
+// Connect to Redis
+const RedisConnect = async () => {
+  client
+    .on('error', (err: any) => console.error('Redis Client Error', err))
+    .connect()
+    .then(() => {
+      console.log('Redis connected!')
+      // client.flushAll().then(() => {
+      //   console.log('Cleared Cache')
+      // })
+      CacheEnabled = true
+    })
+    .catch((_: any) => {
+      ConnectionCount++
+      console.log('Redis Connection Error: Attempt ' + ConnectionCount)
+      console.log('Caching Disabled')
+      CacheEnabled = false
+      if (ConnectionCount > 3) {
+        console.log('Redis Connection Error: Max Attempts Reached')
+        console.log('Caching Permanently Disabled')
+        return
+      } else {
+        setTimeout(() => {
+          RedisConnect()
+        }, 5000)
+      }
+    })
+}
+RedisConnect()
+
 let CacheEnabled = process.env.CACHE_ENABLED || true
 let ConnectionCount = 0
 // CORS
@@ -194,34 +224,6 @@ app.onError((err, c) => {
   })
 })
 
-// Connect to Redis
-const RedisConnect = async () => {
-  client
-    .connect()
-    .then(() => {
-      console.log('Redis connected!')
-      // client.flushAll().then(() => {
-      //   console.log('Cleared Cache')
-      // })
-      CacheEnabled = true
-    })
-    .catch((err) => {
-      ConnectionCount++
-      console.log('Redis Connection Error: Attempt ' + ConnectionCount)
-      console.log('Caching Disabled')
-      CacheEnabled = false
-      if (ConnectionCount > 3) {
-        console.log('Redis Connection Error: Max Attempts Reached')
-        console.log('Caching Permanently Disabled')
-        return
-      } else {
-        setTimeout(() => {
-          RedisConnect()
-        }, 5000)
-      }
-    })
-}
-RedisConnect()
 // Start the server
 export default {
   port: PORT,
