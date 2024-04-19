@@ -2,7 +2,7 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator } from '../util'
+import { idGenerator, requestSelf } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
 import { typeEnum, statusEnum } from '../../schemas/enums'
@@ -124,16 +124,11 @@ const fetchOneMatch = async (
           })
 
           // Get Teams
-          const teamResponse = await Promise.all(
-            teamIds.map((id) =>
-              fetch(`http://localhost:${process.env.PORT}/team/${id}`)
-            )
+          const teamData = await requestSelf<Team[]>(
+            teamIds.map((id) => `team/${id}`)
           )
-          const teamData = await Promise.all(
-            teamResponse.map((res) => res.json())
-          )
-          Match.teams = teamData.map((team: any, index) => {
-            return { ...team.data, score: MapScore[index] }
+          Match.teams = teamData.map((team, index) => {
+            return { ...team, score: MapScore[index] }
           })
         }
         // get short version of Teams

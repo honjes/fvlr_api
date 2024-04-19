@@ -2,11 +2,11 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator } from '../util'
+import { idGenerator, requestSelf } from '../util'
 // Schema
-import { PORT } from '../..'
 import { typeEnum } from '../../schemas/enums'
 import { EventMatches } from '../../schemas/events'
+import { Match } from '../../schemas/match'
 
 export interface FetchEventMatchesOptions {
   ext?: boolean
@@ -51,17 +51,12 @@ const fetchEventMatches = async (
         })
 
         // request all match data from the API
-        let matches = await Promise.all(
-          matchIDs.map((matchId) => {
-            return fetch(
-              `http://localhost:${PORT}/match/${matchId}?ext=${
-                ext ? 'true' : 'false'
-              }&includePlayers=false`
-            )
-          })
+        Event.matches = await requestSelf<Match[]>(
+          matchIDs.map(
+            (id) =>
+              `match/${id}?ext=${ext ? 'true' : 'false'}&includePlayers=false`
+          )
         )
-        matches = await Promise.all(matches.map((res) => res.json()))
-        Event.matches = matches.map((match: any) => match.data)
 
         resolve(Event)
       })
