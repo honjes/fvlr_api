@@ -200,9 +200,9 @@ const RedisConnect = async () => {
     .connect()
     .then(() => {
       console.log('Redis connected!')
-      client.flushAll().then(() => {
-        console.log('Cleared Cache')
-      })
+      // client.flushAll().then(() => {
+      //   console.log('Cleared Cache')
+      // })
       CacheEnabled = true
     })
     .catch((err) => {

@@ -16,7 +16,13 @@ import { generateScore } from '../scrapers/matches/score'
 
 // Schemas / Types
 import { IDSchema, ErrorSchema, errorSchema } from '../schemas/schemas'
-import { Event } from '../schemas/events'
+import {
+  Event,
+  EventPlayers,
+  EventTeams,
+  eventPlayersSchema,
+  eventTeamsSchema,
+} from '../schemas/events'
 import { ShortEvent } from '../scrapers/events/all'
 import {
   shortEventSchema,
@@ -28,6 +34,8 @@ import { AllMatchSchema, MatchSchema } from '../schemas/match'
 import { playerSchema, Player } from '../schemas/player'
 import { scoreSchema, Score } from '../schemas/score'
 import { teamSchema, Team } from '../schemas/teams'
+import { fetchEventTeams } from '../scrapers/events/teams'
+import { fetchEventPlayers } from '../scrapers/events/players'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
@@ -88,7 +96,6 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     }
   )
 
-  // same as above, but with a different route
   // GET /event/{id}/players
   app.openapi(
     {
@@ -100,22 +107,21 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       },
       responses: {
         200: {
-          description: 'Fetches a specific event',
+          description: 'Fetches Players of a specific event',
           content: {
             'application/json': {
-              schema: eventSchema,
+              schema: eventPlayersSchema,
             },
           },
         },
       },
     },
     async (c: Context) => {
-      const Event = await fetchOneEvent(c.req.param('id'))
-      return c.json<Event>(Event)
+      const EventPlayers = await fetchEventPlayers(c.req.param('id'))
+      return c.json<EventPlayers>(EventPlayers)
     }
   )
 
-  // same as above, but with a different route
   // GET /event/{id}/teams
   app.openapi(
     {
@@ -127,18 +133,18 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       },
       responses: {
         200: {
-          description: 'Fetches a specific event',
+          description: 'Fetches Teams of a specific event',
           content: {
             'application/json': {
-              schema: eventSchema,
+              schema: eventTeamsSchema,
             },
           },
         },
       },
     },
     async (c: Context) => {
-      const Event = await fetchOneEvent(c.req.param('id'))
-      return c.json<Event>(Event)
+      const eventTeams = await fetchEventTeams(c.req.param('id'))
+      return c.json<EventTeams>(eventTeams)
     }
   )
 
@@ -167,7 +173,7 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     },
     async (c: Context) => {
       const id = c.req.param('id')
-      const ext = Boolean(c.req.query('ext'))
+      const ext = Boolean(c.req.query('ext') || false)
 
       // Validate input
       // make sure id is a string of numbers
@@ -234,8 +240,8 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
-      const ext = Boolean(c.req.query('ext'))
-      const includePlayers = Boolean(c.req.query('includePlayers'))
+      const ext = Boolean(c.req.query('ext') || false)
+      const includePlayers = Boolean(c.req.query('includePlayers') || true)
       // validate Match ID
       // make sure id is a string of numbers
       if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
@@ -307,8 +313,8 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
     }),
     async (c: Context) => {
       const id = c.req.param('id')
-      const ext = Boolean(c.req.query('ext'))
-      const includePlayers = Boolean(c.req.query('includePlayers'))
+      const ext = Boolean(c.req.query('ext') || false)
+      const includePlayers = Boolean(c.req.query('includePlayers') || true)
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')

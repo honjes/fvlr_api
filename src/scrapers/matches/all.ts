@@ -6,7 +6,7 @@ import { idGenerator } from '../util'
 import { fetchOneMatch } from './one'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { AllMatchSchema } from '../../schemas/schemas'
+import { AllMatchSchema } from '../../schemas/match'
 // Type
 export type AllMatches = z.infer<typeof AllMatchSchema>
 

@@ -43,4 +43,24 @@ fetch('https://valorant-api.com/v1/agents')
     console.log('Agents Updated')
   })
 
+// Requests the api for the given url and returns json data
+export async function requestSelf<T>(path: string | string[]): Promise<T> {
+  if (Array.isArray(path)) {
+    const data = await Promise.all(
+      path.map(async (p) => {
+        const response = await fetch(
+          `http://localhost:${process.env.PORT}/${p}`
+        )
+        return response.json()
+      })
+    )
+
+    return data.map((d) => d.data) as T
+  }
+  const response = await fetch(`http://localhost:${process.env.PORT}/${path}`)
+  const data = await response.json()
+
+  return data.data as T
+}
+
 export { idGenerator, AgentArray }

@@ -2,6 +2,8 @@ import { z } from '@hono/zod-openapi'
 import { typeEnum, regionsEnum, statusEnum } from './enums'
 import { IDType } from './schemas'
 import { MatchSchema } from './match'
+import { teamSchema } from './teams'
+import { playerSchema } from './player'
 
 // Schema for the /events endpoint
 export const shortEventSchema = z
@@ -117,3 +119,15 @@ export const eventMatchesSchema = z.object({
   matches: MatchSchema.array(),
 })
 export type EventMatches = z.infer<typeof eventMatchesSchema>
+
+// Schema for the /event/{id}/teams endpoint
+export const eventTeamsSchema = eventSchema.extend({
+  teams: z.array(teamSchema),
+})
+export type EventTeams = z.infer<typeof eventTeamsSchema>
+
+// Schema for the /event/{id}/players endpoint
+export const eventPlayersSchema = eventSchema.extend({
+  players: z.array(playerSchema),
+})
+export type EventPlayers = z.infer<typeof eventPlayersSchema>
