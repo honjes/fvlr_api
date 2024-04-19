@@ -16,7 +16,7 @@ import { generateScore } from '../scrapers/matches/score'
 
 // Schemas / Types
 import { IDSchema, ErrorSchema, errorSchema } from '../schemas/schemas'
-import { Event } from '../schemas/events'
+import { Event, EventTeams, eventTeamsSchema } from '../schemas/events'
 import { ShortEvent } from '../scrapers/events/all'
 import {
   shortEventSchema,
@@ -28,6 +28,7 @@ import { AllMatchSchema, MatchSchema } from '../schemas/match'
 import { playerSchema, Player } from '../schemas/player'
 import { scoreSchema, Score } from '../schemas/score'
 import { teamSchema, Team } from '../schemas/teams'
+import { fetchEventTeams } from '../scrapers/events/teams'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
@@ -130,15 +131,15 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
           description: 'Fetches a specific event',
           content: {
             'application/json': {
-              schema: eventSchema,
+              schema: eventTeamsSchema,
             },
           },
         },
       },
     },
     async (c: Context) => {
-      const Event = await fetchOneEvent(c.req.param('id'))
-      return c.json<Event>(Event)
+      const eventTeams = await fetchEventTeams(c.req.param('id'))
+      return c.json<EventTeams>(eventTeams)
     }
   )
 
