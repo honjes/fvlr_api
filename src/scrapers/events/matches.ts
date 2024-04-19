@@ -4,10 +4,22 @@
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
-import { EventMatches, typeEnum } from '../../schemas/schemas'
 import { PORT } from '../..'
+import { typeEnum } from '../../schemas/enums'
+import { EventMatches } from '../../schemas/events'
 
-const fetchEventMatches = async (id: string): Promise<EventMatches> => {
+export interface FetchEventMatchesOptions {
+  ext?: boolean
+}
+
+const fetchEventMatches = async (
+  id: string,
+  options: FetchEventMatchesOptions
+): Promise<EventMatches> => {
+  const optionsDefault: FetchEventMatchesOptions = {
+    ext: false,
+  }
+  const { ext } = { ...optionsDefault, ...options }
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/event/matches/${id}`)
@@ -41,7 +53,11 @@ const fetchEventMatches = async (id: string): Promise<EventMatches> => {
         // request all match data from the API
         let matches = await Promise.all(
           matchIDs.map((matchId) => {
-            return fetch(`http://localhost:${PORT}/match/${matchId}`)
+            return fetch(
+              `http://localhost:${PORT}/match/${matchId}?ext=${
+                ext ? 'true' : 'false'
+              }&includePlayers=false`
+            )
           })
         )
         matches = await Promise.all(matches.map((res) => res.json()))

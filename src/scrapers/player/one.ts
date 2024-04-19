@@ -3,7 +3,8 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator, AgentArray } from '../util'
-import { AgentStats, PlayerAgentStats, Player } from '../../schemas/schemas'
+import { Player, PlayerAgentStats } from '../../schemas/player'
+import { AgentStats } from '../../schemas/stats'
 
 const fetchOnePlayer = async (id: string) => {
   // Validate input

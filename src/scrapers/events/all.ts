@@ -5,7 +5,8 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { shortEventSchema, regionsEnum, typeEnum } from '../../schemas/schemas'
+import { typeEnum, regionsEnum } from '../../schemas/enums'
+import { shortEventSchema } from '../../schemas/events'
 // Type
 export type ShortEvent = z.infer<typeof shortEventSchema>
 export type ShortEventElement = z.infer<typeof shortEventSchema.element>

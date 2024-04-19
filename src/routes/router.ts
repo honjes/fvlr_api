@@ -14,28 +14,20 @@ import { fetchOneTeam } from '../scrapers/team/one'
 import { fetchEventMatches } from '../scrapers/events/matches'
 import { generateScore } from '../scrapers/matches/score'
 
-// Schemas
+// Schemas / Types
+import { IDSchema, ErrorSchema, errorSchema } from '../schemas/schemas'
+import { Event } from '../schemas/events'
+import { ShortEvent } from '../scrapers/events/all'
 import {
-  AllMatchSchema,
   shortEventSchema,
-  IDSchema,
-  MatchSchema,
-  Player,
-  Team,
-  playerSchema,
-  teamSchema,
   eventSchema,
-  Event,
   eventMatchesSchema,
   EventMatches,
-  scoreSchema,
-  Score,
-  ErrorSchema,
-  errorSchema,
-} from '../schemas/schemas'
-
-// Types
-import { ShortEvent } from '../scrapers/events/all'
+} from '../schemas/events'
+import { AllMatchSchema, MatchSchema } from '../schemas/match'
+import { playerSchema, Player } from '../schemas/player'
+import { scoreSchema, Score } from '../schemas/score'
+import { teamSchema, Team } from '../schemas/teams'
 
 // Works Perfectly
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
@@ -158,6 +150,9 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Event Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.string().default('false'),
+        }),
       },
       responses: {
         200: {
@@ -172,11 +167,13 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
     },
     async (c: Context) => {
       const id = c.req.param('id')
+      const ext = Boolean(c.req.query('ext'))
+
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
 
-      const Event = await fetchEventMatches(id)
+      const Event = await fetchEventMatches(id, { ext })
       return c.json<EventMatches>(Event)
     }
   )
@@ -219,6 +216,10 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Root Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.string().default('false'),
+          includePlayers: z.string().default('true'),
+        }),
       },
       description: 'Fetches a Match based on the Match ID from vlr.gg',
       responses: {
@@ -233,10 +234,15 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       },
     }),
     async (c: Context) => {
+      const ext = Boolean(c.req.query('ext'))
+      const includePlayers = Boolean(c.req.query('includePlayers'))
       // validate Match ID
       // make sure id is a string of numbers
       if (!c.req.param('id').match(/^[0-9]+$/)) throw new Error('Invalid ID')
-      const Match = await fetchOneMatch(c.req.param('id'))
+      const Match = await fetchOneMatch(c.req.param('id'), {
+        ext,
+        includePlayers,
+      })
       return c.json<Match>(Match)
     }
   )
@@ -282,6 +288,10 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
       tags: ['Root Routes'],
       request: {
         params: IDSchema,
+        query: z.object({
+          ext: z.string().default('false'),
+          includePlayers: z.string().default('true'),
+        }),
       },
       description: 'Fetches a Team based on their ID from vlr.gg',
       responses: {
@@ -297,11 +307,13 @@ function addTeamRoutes(app: OpenAPIHono<Env, {}, '/'>) {
     }),
     async (c: Context) => {
       const id = c.req.param('id')
+      const ext = Boolean(c.req.query('ext'))
+      const includePlayers = Boolean(c.req.query('includePlayers'))
       // Validate input
       // make sure id is a string of numbers
       if (!id.match(/^[0-9,]+$/)) throw new Error('Invalid ID')
 
-      const Team = await fetchOneTeam(id)
+      const Team = await fetchOneTeam(id, { ext, includePlayers })
       return c.json<Team>(Team)
     }
   )

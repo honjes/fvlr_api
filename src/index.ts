@@ -6,7 +6,7 @@ import addRoutes from './routes/router'
 import { createClient } from 'redis'
 import 'dotenv/config'
 import { Match } from './scrapers/matches/one'
-import { statusEnum, typeEnum } from './schemas/schemas'
+import { statusEnum } from './schemas/enums'
 const DB_URI = process.env.DB_URI || 'redis://redis:6379'
 export const PORT = process.env.PORT || 9091
 // Initial Setup
@@ -50,9 +50,13 @@ app.use('*', async (c, next) => {
   }
   console.log(c.req.path)
 
-  const cachedPath = c.req.path.replaceAll(/\/0+/gm, '/') // Remove any trailing zeros from the path
+  const cachedPath = c.req.raw.url
+    .replace(c.req.header('host') || '', '')
+    .replace('http://', '')
+    .replace('https://', '')
+    .replaceAll(/\/0+/gm, '/') // Remove any trailing zeros from the path
   // Cached Response
-  if (await client.exists(c.req.path)) {
+  if (await client.exists(cachedPath)) {
     console.log('Cached Response')
     const cachedData = await client.get(cachedPath) // .001ms
     if (cachedData === null) return // Should never happen
@@ -107,7 +111,7 @@ app.use('*', async (c, next) => {
     // Intercept the JSON
     let data = await c.res.json()
     // Cache the response
-    let cacheLifespan = 60 * 60 * 1 // 1 Hour
+    let cacheLifespan = 60 * 60 * 24 // 1 Day
     switch (c.req.path.split('/')[1]) {
       case 'match':
         data = data as Match

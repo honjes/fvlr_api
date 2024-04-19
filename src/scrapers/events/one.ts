@@ -3,8 +3,9 @@
 // External Libs
 import { load } from 'cheerio'
 import { idGenerator } from '../util'
+import { typeEnum, statusEnum } from '../../schemas/enums'
+import { Event } from '../../schemas/events'
 // Schema
-import { Event, typeEnum } from '../../schemas/schemas'
 
 const fetchOneEvent = async (id: string): Promise<Event> => {
   return new Promise(async (resolve, reject) => {
@@ -27,6 +28,16 @@ const fetchOneEvent = async (id: string): Promise<Event> => {
         Event.id = id
         Event.logo =
           'https:' + $('.wf-avatar.event-header-thumb img').attr('src')
+        // get status of the event
+        // TODO: implement check for ongoing events
+        Event.status =
+          $(
+            '.event-content > div.wf-card table tbody tr:first-of-type td:nth-of-type(3)'
+          )
+            .text()
+            .trim() == 'TBD'
+            ? statusEnum.Enum.Upcoming
+            : statusEnum.Enum.Completed
         // Get all teams
         const Teams = new Array()
         $('.event-team').each((i, element) => {
@@ -36,6 +47,11 @@ const fetchOneEvent = async (id: string): Promise<Event> => {
             team.logo =
               $(element).find('.event-team-players-mask > img').attr('src') ||
               ''
+            // when no logo is found, use the full vlr logo url
+            team.logo = team.logo.replace(
+              '/img/vlr/tmp/vlr.png',
+              'https://www.vlr.gg/img/vlr/tmp/vlr.png'
+            )
             team.link = $(element).find('.event-team-name').attr('href') || ''
             team.id = idGenerator(team.link.split('/')[2])
             team.players = new Array()
