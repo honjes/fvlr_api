@@ -1,3 +1,5 @@
+// Request All Teams for an Event
+
 import { EventTeams } from '../../schemas/events'
 import { requestSelf } from '../util'
 import { Event } from '../../schemas/events'
