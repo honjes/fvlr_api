@@ -7,7 +7,7 @@ import { idGenerator, requestSelf } from '../util'
 import { z } from '@hono/zod-openapi'
 import { typeEnum, statusEnum } from '../../schemas/enums'
 import {
-  MatchSchema,
+  matchSchema,
   GameTeam,
   Game,
   GameTeamExtended,
@@ -17,7 +17,7 @@ import { PlayerStats } from '../../schemas/player'
 import { ExtStats } from '../../schemas/stats'
 import { Team } from '../../schemas/teams'
 // Types
-export type Match = z.infer<typeof MatchSchema>
+export type Match = z.infer<typeof matchSchema>
 export interface FetchOneMatchOptions {
   ext?: boolean
   includePlayers?: boolean

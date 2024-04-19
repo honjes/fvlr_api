@@ -18,6 +18,7 @@ import { generateScore } from '../scrapers/matches/score'
 import { IDSchema, ErrorSchema, errorSchema } from '../schemas/schemas'
 import {
   Event,
+  EventFull,
   EventPlayers,
   EventTeams,
   eventPlayersSchema,
@@ -30,14 +31,15 @@ import {
   eventMatchesSchema,
   EventMatches,
 } from '../schemas/events'
-import { AllMatchSchema, MatchSchema } from '../schemas/match'
+import { AllMatchSchema, matchSchema } from '../schemas/match'
 import { playerSchema, Player } from '../schemas/player'
 import { scoreSchema, Score } from '../schemas/score'
 import { teamSchema, Team } from '../schemas/teams'
 import { fetchEventTeams } from '../scrapers/events/teams'
 import { fetchEventPlayers } from '../scrapers/events/players'
+import { fetchEventFull } from '../scrapers/events/full'
 
-// Works Perfectly
+// add All Routes related to Events
 function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
   // GET /events
   app.openapi(
@@ -183,6 +185,38 @@ function addEventsRoute(app: OpenAPIHono<Env, {}, '/'>) {
       return c.json<EventMatches>(Event)
     }
   )
+
+  // GET /event/{id}/full
+  app.openapi(
+    {
+      method: 'get',
+      path: '/event/{id}/full',
+      tags: ['Event Routes'],
+      request: {
+        params: IDSchema,
+      },
+      responses: {
+        200: {
+          description: 'Fetches all data of a specific event',
+          content: {
+            'application/json': {
+              schema: eventSchema,
+            },
+          },
+        },
+      },
+    },
+    async (c: Context) => {
+      const id = c.req.param('id')
+
+      // Validate input
+      // make sure id is a string of numbers
+      if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
+
+      const eventFull = await fetchEventFull(id)
+      return c.json<EventFull>(eventFull)
+    }
+  )
 }
 
 // add All Routes related to Matches
@@ -233,7 +267,7 @@ function addMatchRoutes(app: OpenAPIHono<Env, {}, '/'>) {
           description: 'Fetches a Match based on the Match ID from vlr.gg',
           content: {
             'application/json': {
-              schema: MatchSchema,
+              schema: matchSchema,
             },
           },
         },

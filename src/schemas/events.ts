@@ -1,7 +1,7 @@
 import { z } from '@hono/zod-openapi'
 import { typeEnum, regionsEnum, statusEnum } from './enums'
 import { IDType } from './schemas'
-import { MatchSchema } from './match'
+import { matchSchema } from './match'
 import { teamSchema } from './teams'
 import { playerSchema } from './player'
 
@@ -102,6 +102,7 @@ export type Event = z.infer<typeof eventSchema>
 
 // Schema for the /event/{id}/match endpoint
 export const eventMatchesSchema = z.object({
+  id: IDType,
   type: typeEnum.openapi({
     example: 'Event',
   }),
@@ -112,11 +113,10 @@ export const eventMatchesSchema = z.object({
     example:
       'https://www.vlr.gg/event/1927/champions-tour-2023-china-ascension',
   }),
-  id: IDType,
   img: z.string().openapi({
     example: 'https://owcdn.net/img/6009f963577f4.png',
   }),
-  matches: MatchSchema.array(),
+  matches: matchSchema.array(),
 })
 export type EventMatches = z.infer<typeof eventMatchesSchema>
 
@@ -131,3 +131,11 @@ export const eventPlayersSchema = eventSchema.extend({
   players: z.array(playerSchema),
 })
 export type EventPlayers = z.infer<typeof eventPlayersSchema>
+
+// Schema for the /event/{id}/full endpoint
+export const fullEventSchema = eventSchema.extend({
+  matches: z.array(matchSchema),
+  teams: z.array(teamSchema),
+  players: z.array(playerSchema),
+})
+export type EventFull = z.infer<typeof fullEventSchema>
