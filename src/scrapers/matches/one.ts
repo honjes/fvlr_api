@@ -16,6 +16,7 @@ import {
 import { PlayerStats } from '../../schemas/player'
 import { ExtStats } from '../../schemas/stats'
 import { Team } from '../../schemas/teams'
+import { logStats } from '../..'
 // Types
 export type Match = z.infer<typeof matchSchema>
 export interface FetchOneMatchOptions {
@@ -293,7 +294,7 @@ const fetchOneMatch = async (
           }
         })
 
-        console.log('Match Pulled: ' + Match.id)
+        logStats.crawledSites++
         resolve(Match)
       })
       .catch((err) => {

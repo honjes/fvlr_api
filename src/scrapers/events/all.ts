@@ -7,6 +7,7 @@ import { idGenerator } from '../util'
 import { z } from '@hono/zod-openapi'
 import { typeEnum, regionsEnum } from '../../schemas/enums'
 import { shortEventSchema } from '../../schemas/events'
+import { logStats } from '../..'
 // Type
 export type ShortEvent = z.infer<typeof shortEventSchema>
 export type ShortEventElement = z.infer<typeof shortEventSchema.element>
@@ -60,6 +61,7 @@ const fetchAllEvents = (page: number = 1): Promise<ShortEvent> => {
           }
           Events.push(Event)
         })
+        logStats.crawledSites++
         resolve(Events)
       })
   })
