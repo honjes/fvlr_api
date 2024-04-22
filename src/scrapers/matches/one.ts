@@ -120,11 +120,25 @@ const fetchOneMatch = async (id: string): Promise<Match> => {
           Match.games[i].teams[1] = new Object() as GameTeamExtended
           Match.games[i].teams[0].name = Match.teams[0].name
           Match.games[i].teams[1].name = Match.teams[1].name
-          //TODO: scrape Scores
-          Match.games[i].teams[0].scoreAdvanced = { t: 0, ct: 0, ot: 0 }
-          Match.games[i].teams[0].score = '0'
-          Match.games[i].teams[1].scoreAdvanced = { t: 0, ct: 0, ot: 0 }
-          Match.games[i].teams[1].score = '0'
+          const team0Score = $(element).find(`div.team:first-of-type`)
+          Match.games[i].teams[0].scoreAdvanced = {
+            t: Number($(team0Score).find('.mod-t').text().trim()),
+            ct: Number($(team0Score).find('.mod-ct').text().trim()),
+            ot: Number($(team0Score).find('.mod-ot').text().trim()),
+          }
+          Match.games[i].teams[0].score = Number(
+            $(team0Score).find('.score').text().trim()
+          )
+          const team1Score = $(element).find(`div.team:last-of-type`)
+
+          Match.games[i].teams[1].scoreAdvanced = {
+            t: Number($(team1Score).find('.mod-t').text().trim()),
+            ct: Number($(team1Score).find('.mod-ct').text().trim()),
+            ot: Number($(team1Score).find('.mod-ot').text().trim()),
+          }
+          Match.games[i].teams[1].score = Number(
+            $(team1Score).find('.score').text().trim()
+          )
           Match.games[i].teams[0].players = new Array()
           Match.games[i].teams[1].players = new Array()
 
