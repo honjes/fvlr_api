@@ -37,7 +37,9 @@ let AgentArray = [
 fetch('https://valorant-api.com/v1/agents')
   .then((res) => res.json())
   .then((data) => {
-    AgentArray = data.data.map((agent: any) => agent.displayName)
+    AgentArray = data.data
+      .map((agent: any) => agent.displayName.toLowerCase().replace('/', ''))
+      .sort()
     console.log('Agents Updated')
   })
 

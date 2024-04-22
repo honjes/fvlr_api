@@ -5,15 +5,20 @@ import { load } from 'cheerio'
 import { idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
-import { MatchSchema } from '../../schemas/schemas'
+import {
+  ExtStats,
+  Game,
+  MatchSchema,
+  PlayerMatchStatsElement,
+  PlayerStats,
+  GameTeamExtended,
+  statusEnum,
+  typeEnum,
+} from '../../schemas/schemas'
 // Types
-type Match = z.infer<typeof MatchSchema>
+export type Match = z.infer<typeof MatchSchema>
 
-const fetchOneMatch = async (id: string): Promise<Object> => {
-  // Validate input
-  // make sure id is a string of numbers
-  if (!id) return {}
-  else if (!id.match(/^[0-9]+$/)) throw new Error('Invalid ID')
+const fetchOneMatch = async (id: string): Promise<Match> => {
   return new Promise(async (resolve, reject) => {
     // fetch the page
     fetch(`https://www.vlr.gg/${id}`)
@@ -21,8 +26,8 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
       .then((data) => {
         // parse the page
         let $ = load(data)
-        const Match = new Object() as Match
-
+        const Match: Match = new Object() as Match
+        Match.type = typeEnum.Enum.Match
         Match.id = id
         Match.date = $('.match-header-date .moment-tz-convert:nth-child(1)')
           .text()
@@ -30,11 +35,11 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
         Match.time = $('.match-header-date .moment-tz-convert:nth-child(2)')
           .text()
           .trim()
-        Match.eventid =
+        Match.eventId =
           $('.match-header-super a.match-header-event')
             .attr('href')
             ?.split('/')[2] || '0'
-        Match.eventname = $(
+        Match.eventName = $(
           '.match-header-super a.match-header-event div > div:nth-child(1)'
         )
           .text()
@@ -59,13 +64,13 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           }
         })
 
-        Match.status = 'Upcoming'
+        Match.status = statusEnum.Enum.Upcoming
         if (
           $('.match-header-vs-score > .match-header-vs-note:first-child')
             .text()
             .trim() == 'final'
         ) {
-          Match.status = 'Completed'
+          Match.status = statusEnum.Enum.Completed
         }
 
         Match.games = new Array()
@@ -91,7 +96,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
             id: idGenerator(
               $(element).parent().parent().attr('href')?.split('/')[2] || ''
             ),
-            mapScore: MapScore[i],
+            score: MapScore[i],
           })
         })
 
@@ -100,7 +105,7 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
           ".vm-stats-container .vm-stats-game[data-game-id!='all']"
         )
         $(StatsContainer).each((i, element) => {
-          Match.games[i] = new Object()
+          Match.games[i] = new Object() as Game
 
           const map = $(element)
             .find('.map')
@@ -108,16 +113,18 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
             .trim()
             .split('\t')[0]
             .trim()
+          // TODO: make map a enum
           Match.games[i].map = map
           Match.games[i].teams = new Array()
-          Match.games[i].teams[0] = new Object()
-          Match.games[i].teams[1] = new Object()
+          Match.games[i].teams[0] = new Object() as GameTeamExtended
+          Match.games[i].teams[1] = new Object() as GameTeamExtended
           Match.games[i].teams[0].name = Match.teams[0].name
           Match.games[i].teams[1].name = Match.teams[1].name
-          Match.games[i].teams[0].scoreAdvanced = { c: 0, ct: 0, ot: 0 }
-          Match.games[i].teams[0].score = 0
-          Match.games[i].teams[1].scoreAdvanced = { c: 0, ct: 0, ot: 0 }
-          Match.games[i].teams[1].score = 0
+          //TODO: scrape Scores
+          Match.games[i].teams[0].scoreAdvanced = { t: 0, ct: 0, ot: 0 }
+          Match.games[i].teams[0].score = '0'
+          Match.games[i].teams[1].scoreAdvanced = { t: 0, ct: 0, ot: 0 }
+          Match.games[i].teams[1].score = '0'
           Match.games[i].teams[0].players = new Array()
           Match.games[i].teams[1].players = new Array()
 
@@ -126,7 +133,6 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
             const PlayerContainers = $(element).find(
               '.wf-table-inset.mod-overview tr'
             )
-            console.log(PlayerContainers.length)
             PlayerContainers.each((index, element) => {
               if (
                 $(element)
@@ -135,21 +141,21 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
                   .trim() == ''
               )
                 return
-              const Player = new Object()
-              Player.name = $(element)
+              const player = new Object() as PlayerMatchStatsElement
+              player.name = $(element)
                 .find('.mod-player a div:nth-child(1)')
                 .text()
                 .trim()
-              Player.team = $(element)
+              player.team = $(element)
                 .find('.mod-player a div:nth-child(2)')
                 .text()
                 .trim()
-              Player.link = `https://www.vlr.gg${$(element)
+              player.link = `https://www.vlr.gg${$(element)
                 .find('.mod-player a')
                 .attr('href')}`
               const playerStats = $(element).find('.mod-stat')
-              Player.statsadvanced = new Object()
-              Player.stats = new Object()
+              player.statsAdvanced = new Object() as ExtStats
+              player.stats = new Object() as PlayerStats
               playerStats.each((i, element) => {
                 const ct = $(element).find('.mod-ct').text().trim()
                 const t = $(element).find('.mod-t').text().trim()
@@ -162,58 +168,58 @@ const fetchOneMatch = async (id: string): Promise<Object> => {
                 }
                 switch (i) {
                   case 0:
-                    Player.statsadvanced.kdr = data
-                    Player.stats.kdr = both
+                    player.statsAdvanced.kdr = data
+                    player.stats.kdr = both
                     break
                   case 1:
-                    Player.statsadvanced.acs = data
-                    Player.stats.acs = both
+                    player.statsAdvanced.acs = data
+                    player.stats.acs = both
                     break
                   case 2:
-                    Player.statsadvanced.k = data
-                    Player.stats.k = both
+                    player.statsAdvanced.k = data
+                    player.stats.k = both
                     break
                   case 3:
-                    Player.statsadvanced.d = data
-                    Player.stats.d = both
+                    player.statsAdvanced.d = data
+                    player.stats.d = both
                     break
                   case 4:
-                    Player.statsadvanced.a = data
-                    Player.stats.a = both
+                    player.statsAdvanced.a = data
+                    player.stats.a = both
                     break
                   case 5:
-                    Player.statsadvanced.kdb = data
-                    Player.stats.kdb = both
+                    player.statsAdvanced.kdb = data
+                    player.stats.kdb = both
                     break
                   case 6:
-                    Player.statsadvanced.kast = data
-                    Player.stats.kast = both
+                    player.statsAdvanced.kast = data
+                    player.stats.kast = both
                     break
                   case 7:
-                    Player.statsadvanced.adr = data
-                    Player.stats.adr = both
+                    player.statsAdvanced.adr = data
+                    player.stats.adr = both
                     break
                   case 8:
-                    Player.statsadvanced.hs = data
-                    Player.stats.hs = both
+                    player.statsAdvanced.hs = data
+                    player.stats.hs = both
                     break
                   case 9:
-                    Player.statsadvanced.fk = data
-                    Player.stats.fk = both
+                    player.statsAdvanced.fk = data
+                    player.stats.fk = both
                     break
                   case 10:
-                    Player.statsadvanced.fd = data
-                    Player.stats.fd = both
+                    player.statsAdvanced.fd = data
+                    player.stats.fd = both
                     break
                   case 11:
-                    Player.statsadvanced.fkdb = data
-                    Player.stats.fkdb = both
+                    player.statsAdvanced.fkdb = data
+                    player.stats.fkdb = both
                     break
                   default:
                     break
                 }
               })
-              Match.players.push(Player)
+              Match.players.push(player)
             })
           } else {
             // Add Logic for 2nd event to merge into first one
