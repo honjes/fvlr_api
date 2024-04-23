@@ -114,6 +114,8 @@ app.use('*', async (c, next) => {
         // Check if the match is completed
         if (data.status === statusEnum.Enum.Completed)
           cacheLifespan = 60 * 60 * 24 * 365 // 1 Year
+        else
+          cacheLifespan = 60 // For live stats
         break
       case 'event':
         if (data.status) {
