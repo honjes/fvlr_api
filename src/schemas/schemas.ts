@@ -205,9 +205,7 @@ export type AgentStats = z.infer<typeof agentStatsObject>
 
 // Object for the player stats of top agents
 export const playerAgentStatsObject = z.object({
-  labels: z.array(z.string()),
   time: timeEnum,
-  times: z.array(z.string()),
   data: z.array(agentStatsObject),
 })
 export type PlayerAgentStats = z.infer<typeof playerAgentStatsObject>
@@ -224,8 +222,8 @@ const gameTeamObject = z.object({
     .openapi({
       example: '000000000001927',
     }),
-  score: z.string().openapi({
-    example: '13',
+  score: z.number().openapi({
+    example: 13,
   }),
 })
 export type GameTeam = z.infer<typeof gameTeamObject>

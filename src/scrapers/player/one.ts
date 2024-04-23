@@ -2,8 +2,13 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator, getAgentArray } from '../util'
-import { AgentStats, PlayerAgentStats, Player } from '../../schemas/schemas'
+import { idGenerator, AgentArray } from '../util'
+import {
+  AgentStats,
+  PlayerAgentStats,
+  Player,
+  timeEnum,
+} from '../../schemas/schemas'
 
 const fetchOnePlayer = async (id: string) => {
   // Validate input
@@ -74,9 +79,7 @@ export const fetchPlayer = async (id: string): Promise<Player> => {
           if (i == 0) statLabelsArray.push('Agent')
           else statLabelsArray.push($(element).text().trim())
         })
-        Player.stats.labels = statLabelsArray
-        Player.stats.time = 't60'
-        Player.stats.times = ['t30', 't60', 't90', 'tall']
+        Player.stats.time = timeEnum.Enum.t60
         Player.stats.data = new Array()
         // itterate through each row in the table (default t60)
         $(statRows).each((i, element) => {
