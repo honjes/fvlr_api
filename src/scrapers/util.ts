@@ -43,4 +43,16 @@ fetch('https://valorant-api.com/v1/agents')
     console.log('Agents Updated')
   })
 
+/**
+ * Takes a photo url and adds https: if it doesn't exist and removes newlines and tabs
+ * @param {string} photo - The photo url to clean
+ * @returns {string} - The cleaned photo url
+ */
+export function cleanPhoto(photo: string): string {
+  if (photo === undefined) return ''
+  if (photo.includes('owcdn.net')) photo = `https:${photo}`
+  else photo = ''
+  return photo.replace(/[\n,\t]/g, '')
+}
+
 export { idGenerator, AgentArray }
