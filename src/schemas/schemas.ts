@@ -3,6 +3,9 @@ import { z } from '@hono/zod-openapi'
 // Enums
 export const regionsEnum = z.enum([
   'EU',
+  'US',
+  'CN',
+  'DE',
   'NA',
   'KR',
   'BR',

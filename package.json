@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "test": "bun test --watch",
     "format": "prettier --write ."
   },
   "dependencies": {

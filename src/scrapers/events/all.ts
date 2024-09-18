@@ -12,32 +12,28 @@ export type ShortEventElement = z.infer<typeof shortEventSchema.element>
 
 const fetchAllEvents = (page: number = 1): Promise<ShortEvent> => {
   return new Promise((resolve, reject) => {
-    const Events: ShortEvent = []
+    const events: ShortEvent = []
     fetch(`https://www.vlr.gg/events/?page=${page}`)
       .then((response) => response.text())
       .then((data) => {
         const $ = load(data)
         $('.event-item').each((i, element) => {
-          const Event = {} as ShortEventElement
-          Event.type = typeEnum.Enum.Event
-          Event.link = `https://www.vlr.gg` + $(element).attr('href')
-          Event.id = idGenerator(Event.link.split('/')[4])
-          Event.name = $(element).find('.event-item-title').text().trim()
-          Event.date = $(element)
+          const eventLink = `https://www.vlr.gg` + $(element).attr('href')
+          const eventDate = $(element)
             .find('.event-item-desc-item.mod-dates')
             .text()
             .trim()
             .split('\t')[0]
-          Event.status = $(element)
+          const eventStatus = $(element)
             .find('.event-item-desc-item-status')
             .text()
             .trim()
-          Event.prize = $(element)
+          const eventPrize = $(element)
             .find('.event-item-desc-item.mod-prize')
             .text()
             .trim()
             .split('\t')[0]
-          Event.region = regionsEnum.parse(
+          const eventRegion = regionsEnum.parse(
             $(element)
               .find('.event-item-desc-item.mod-location > i')
               .attr('class')
@@ -45,21 +41,24 @@ const fetchAllEvents = (page: number = 1): Promise<ShortEvent> => {
               .split('-')[1]
               .toUpperCase()
           )
-          Event.logo =
-            'https:' + $(element).find('.event-item-thumb > img').attr('src')
-          if (!Event.logo.includes('https://')) {
-            // Check if it has 1 slash or none
-            if (Event.logo.includes('https:/')) {
-              // It has 1 slash, add another
-              Event.logo = Event.logo.replace('https:/', 'https://')
-            } else {
-              // It has no slashes, add 2
-              Event.logo = Event.logo.replace('https:', 'https://')
-            }
-          }
-          Events.push(Event)
+          const eventLogo = cleanPhoto(
+            $(element).find('.event-item-thumb > img').attr('src') || ''
+          )
+
+          console.log('Event Link: ', eventLink)
+          events.push({
+            type: typeEnum.Enum.Event,
+            link: eventLink,
+            id: idGenerator(eventLink.split('/')[4]),
+            name: $(element).find('.event-item-title').text().trim(),
+            date: eventDate,
+            status: eventStatus,
+            prize: eventPrize,
+            region: eventRegion,
+            logo: eventLogo,
+          })
         })
-        resolve(Events)
+        resolve(events)
       })
   })
 }
