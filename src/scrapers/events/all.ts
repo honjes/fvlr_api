@@ -2,7 +2,7 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator } from '../util'
+import { cleanPhoto, idGenerator } from '../util'
 // Schema
 import { z } from '@hono/zod-openapi'
 import { shortEventSchema, regionsEnum, typeEnum } from '../../schemas/schemas'

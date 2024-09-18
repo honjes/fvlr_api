@@ -2,7 +2,7 @@
 
 // External Libs
 import { load } from 'cheerio'
-import { idGenerator, AgentArray } from '../util'
+import { idGenerator, AgentArray, cleanPhoto } from '../util'
 import { AgentStats, PlayerAgentStats, Player } from '../../schemas/schemas'
 
 const fetchOnePlayer = async (id: string) => {
@@ -138,12 +138,6 @@ const cleanCountry = (country: string) => {
     country = ''
   }
   return country
-}
-const cleanPhoto = (photo: string) => {
-  if (photo === undefined) return ''
-  if (photo.includes('owcdn.net')) photo = `https:${photo}`
-  else photo = ''
-  return photo.replace(/[\n,\t]/g, '')
 }
 
 export { fetchOnePlayer }
