@@ -21,14 +21,14 @@ const fetchEventMatches = async (id: string): Promise<EventMatches> => {
             .includes('Page not found')
         )
           reject('404')
-        const Event = {} as EventMatches
-        Event.type = typeEnum.Enum.Event
-        Event.name = $('h1.wf-title').text().trim()
-        Event.link = `https://www.vlr.gg/event/${id}`
-        Event.id = idGenerator(id)
-        Event.img =
-          'https:' + $('.wf-avatar.event-header-thumb img').attr('src')
-
+        const event: EventMatches = {
+          type: typeEnum.Enum.Event,
+          name: $('h1.wf-title').text().trim(),
+          link: `https://www.vlr.gg/event/${id}`,
+          id: idGenerator(id),
+          img: 'https:' + $('.wf-avatar.event-header-thumb img').attr('src'),
+          matches: [],
+        }
         // Pull all match IDs
         const matchIDs = new Array()
         $('a.match-item').each((i, element) => {
@@ -45,9 +45,9 @@ const fetchEventMatches = async (id: string): Promise<EventMatches> => {
           })
         )
         matches = await Promise.all(matches.map((res) => res.json()))
-        Event.matches = matches.map((match: any) => match.data)
+        event.matches = matches.map((match: any) => match.data)
 
-        resolve(Event)
+        resolve(event)
       })
       .catch((err) => {
         reject(err)
